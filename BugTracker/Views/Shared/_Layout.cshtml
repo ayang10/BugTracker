@@ -1,0 +1,214 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- start: Meta -->
+    <meta charset="utf-8">
+    <title>BuggyTracker</title>
+    <meta name="description" content="Perfectum Dashboard Bootstrap Admin Template.">
+    <meta name="author" content="Łukasz Holeczek">
+    <!-- end: Meta -->
+    <!-- start: Mobile Specific -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- end: Mobile Specific -->
+    <!-- start: CSS -->
+    <link id="bootstrap-style" href="~/perfectum_dashboard_1_0_5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/perfectum_dashboard_1_0_5/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link id="base-style" href="~/perfectum_dashboard_1_0_5/css/style.css" rel="stylesheet">
+    <link id="base-style-responsive" href="~/perfectum_dashboard_1_0_5/css/style-responsive.css" rel="stylesheet">
+   
+    <link href="~/perfectum_dashboard_1_0_5/css/jquery.dataTables.css" rel="stylesheet" />
+    <!-- start: Favicon -->
+    <link rel="shortcut icon" href="~/perfectum_dashboard_1_0_5/img/bug.png">
+    <!-- end: Favicon -->
+
+
+
+
+</head>
+<body>
+    
+    <!-- start: Header -->
+    <div class="navbar">
+        <div class="navbar-inner">
+            <div class="container-fluid">
+                <a class="btn btn-navbar" data-toggle="collapse" data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </a>
+                <a class="brand" href="@Url.Action("Index", "Home")"> <img alt="Perfectum Dashboard" src="~/perfectum_dashboard_1_0_5/img/bug.png" width="40" /> <span class="hidden-phone">BuggyTracker</span></a>
+
+                <div class="pull-right">@Html.Partial("_LoginPartial")</div>
+       
+
+            </div>
+        </div>
+    </div>
+    <!-- start: Header -->
+
+    <div class="container-fluid">
+        <div class="row-fluid">
+
+            <!-- start: Main Menu -->
+            <div class="span2 main-menu-span">
+                <div class="nav-collapse sidebar-nav">
+                    <ul class="nav nav-tabs nav-stacked ">
+                        <li><a href="@Url.Action("Dashboard", "Home")"><i class="icon-home icon-white"></i><span class="hidden-tablet"> Dashboard</span></a></li>
+                        <li><a href="@Url.Action("EditUserRole", "Home")"><i class="icon-edit icon-white"></i><span class="hidden-tablet"> Edit Roles</span></a></li>
+                        <li>
+                            <a class="dropmenu" href="#"><i class="fa-icon-folder-close-alt"></i><span class="hidden-tablet"> Project</span></a>
+                            <ul>
+                                <li><a href="@Url.Action("Create", "Projects")"><i class="icon-eye-open icon-white"></i><span class="hidden-tablet"> Create New Projects</span></a></li>
+                              
+                            </ul>
+                        </li>
+                        <li>
+                            <a class="dropmenu" href="#"><i class="icon-list-alt icon-white"></i><span class="hidden-tablet"> Ticket</span></a>
+                            <ul>
+                                <li><a href="@Url.Action("Create", "Tickets")"><i class="icon-eye-open icon-white"></i><span class="hidden-tablet"> Create New Tickets</span></a></li>
+
+                            </ul>
+                        </li>
+                        <li><a href="form.html"><i class="icon-edit icon-white"></i><span class="hidden-tablet"> Forms</span></a></li>
+                        <li><a href="chart.html"><i class="icon-list-alt icon-white"></i><span class="hidden-tablet"> Charts</span></a></li>
+                        <li>
+                            <a class="dropmenu" href="#"><i class="fa-icon-folder-close-alt"></i><span class="hidden-tablet"> Dropdown</span></a>
+                            <ul>
+                                <li><a class="submenu" href="submenu.html"><i class="fa-icon-file-alt"></i><span class="hidden-tablet"> Sub Menu 1</span></a></li>
+                                <li><a class="submenu" href="submenu.html"><i class="fa-icon-file-alt"></i><span class="hidden-tablet"> Sub Menu 2</span></a></li>
+                                <li><a class="submenu" href="submenu.html"><i class="fa-icon-file-alt"></i><span class="hidden-tablet"> Sub Menu 3</span></a></li>
+                            </ul>
+                        </li>
+                        <li><a href="typography.html"><i class="icon-font icon-white"></i><span class="hidden-tablet"> Typography</span></a></li>
+                        <li><a href="gallery.html"><i class="icon-picture icon-white"></i><span class="hidden-tablet"> Gallery</span></a></li>
+                        <li><a href="table.html"><i class="icon-align-justify icon-white"></i><span class="hidden-tablet"> Tables</span></a></li>
+                        <li><a href="calendar.html"><i class="icon-calendar icon-white"></i><span class="hidden-tablet"> Calendar</span></a></li>
+                        <li><a href="grid.html"><i class="icon-th icon-white"></i><span class="hidden-tablet"> Grid</span></a></li>
+                        <li><a href="file-manager.html"><i class="icon-folder-open icon-white"></i><span class="hidden-tablet"> File Manager</span></a></li>
+                        <li><a href="icon.html"><i class="icon-star icon-white"></i><span class="hidden-tablet"> Icons</span></a></li>
+                        <li><a href="login.html"><i class="icon-lock icon-white"></i><span class="hidden-tablet"> Login Page</span></a></li>
+                    </ul>
+                </div><!--/.well -->
+            </div><!--/span-->
+            <!-- end: Main Menu -->
+
+
+            <div id="content" class="span10">
+                <!-- start: Content -->
+
+            
+
+
+                    @RenderBody()
+
+            
+        </div><!--/fluid-row-->
+
+           </div>
+
+    </div><!--/.fluid-container-->
+    <!-- start: JavaScript-->
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery-1.9.1.min.js"></script>
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery-migrate-1.0.0.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery-ui-1.10.0.custom.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.ui.touch-punch.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/bootstrap.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.cookie.js"></script>
+
+    <script src='~/perfectum_dashboard_1_0_5/js/fullcalendar.min.js'></script>
+
+    <script src='~/perfectum_dashboard_1_0_5/js/jquery.dataTables.min.js'></script>
+    <script src="~/perfectum_dashboard_1_0_5/js/excanvas.js"></script>
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.flot.min.js"></script>
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.flot.pie.min.js"></script>
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.flot.stack.js"></script>
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.flot.resize.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.chosen.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.uniform.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.cleditor.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.noty.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.elfinder.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.raty.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.iphone.toggle.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.uploadify-3.1.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.gritter.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.imagesloaded.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.masonry.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.knob.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.sparkline.min.js"></script>
+    <script src="~/perfectum_dashboard_1_0_5/js/custom.js"></script>
+   
+    <!-- end: JavaScript-->
+
+    @RenderSection("scripts", required: false)
+
+</body>
+</html>
+
+
+
+
+<!-------------------------------------------------------------->
+
+@*<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
+                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>*@

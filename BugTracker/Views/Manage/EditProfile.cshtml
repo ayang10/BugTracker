@@ -1,0 +1,44 @@
+﻿@model BugTracker.Models.EditProfileViewModel
+@{
+    ViewBag.Title = "BuggyTracker - Profile";
+}
+<br />
+<br />
+<div class="container">
+   
+                    @using (Html.BeginForm("EditProfile", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary("", new { @class = "text-danger" })
+
+                        <p class="text-success">@ViewBag.StatusMessage</p>
+
+                        <div class="form-group">
+                            <b>First Name</b>
+                            <div class="col-md-4">
+                                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                            </div>
+                            <br />
+                            <b>Last Name</b>
+                            <div class="col-md-4">
+                                @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <b>Last Name</b>
+                            <div class="col-md-10">
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    
+                        <br />
+                        <div class="form-group">
+                            <div class="col-md-2 pull-left">
+                                <input type="submit" value="Update" class="btn btn-lg btn-success btn-block" />
+                            </div>
+                        </div>
+                    }
+          
+</div>
+

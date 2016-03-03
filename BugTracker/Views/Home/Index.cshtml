@@ -1,0 +1,160 @@
+﻿@{
+    ViewBag.Title = "BuggyTracker - Home";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- start: Meta -->
+    <meta charset="utf-8">
+    <title>BuggyTracker - Home</title>
+    <meta name="description" content="Perfectum Dashboard Bootstrap Admin Template.">
+    <meta name="author" content="Łukasz Holeczek">
+    <!-- end: Meta -->
+    <!-- start: Mobile Specific -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- end: Mobile Specific -->
+    <!-- start: CSS -->
+    <link id="bootstrap-style" href="~/perfectum_dashboard_1_0_5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/perfectum_dashboard_1_0_5/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link id="base-style" href="~/perfectum_dashboard_1_0_5/css/style.css" rel="stylesheet">
+    <link id="base-style-responsive" href="~/perfectum_dashboard_1_0_5/css/style-responsive.css" rel="stylesheet">
+
+    <!-- start: Favicon -->
+    <link rel="shortcut icon" href="~/perfectum_dashboard_1_0_5/img/bug.png">
+    <!-- end: Favicon -->
+
+
+
+
+</head>
+<body>
+
+    <!-- start: Header -->
+    <div class="navbar">
+        <div class="navbar-inner">
+            <div class="container-fluid">
+                @*<a class="btn btn-navbar" data-toggle="collapse" data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>*@
+                <a class="brand" href="@Url.Action("Index", "Home")"> <img alt="Perfectum Dashboard" src="~/perfectum_dashboard_1_0_5/img/bug.png" width="40" /> <span class="hidden-phone">BuggyTracker</span></a>
+
+                <div class="pull-right">@Html.Partial("_LoginPartial")</div>
+
+
+            </div>
+        </div>
+    </div>
+    <!-- start: Header -->
+
+    <div class="container-fluid">
+        <div class="row-fluid">
+
+            <!-- start: Main Menu -->
+            <div class="span2 main-menu-span">
+                <div class="nav-collapse sidebar-nav">
+                  
+                </div><!--/.well -->
+            </div><!--/span-->
+            <!-- end: Main Menu -->
+
+
+            <div id="content" class="span10">
+                <!-- start: Content -->
+
+                <h1>Hello & Welcome to BuggyTracker!</h1>
+                <hr />
+
+
+                <img src="~/perfectum_dashboard_1_0_5/img/banner_defect-tracking-tools.jpg" width="1250" />
+
+                <hr />
+                <h1>Register with us to experience what we have to offer.</h1>
+                @if (User.Identity.IsAuthenticated == false)
+                {
+
+
+                    <div class="buttons">
+                        @Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink", @class = "btn btn-skin btn-lg btn-primary" })
+
+                    </div>
+                }
+
+                <hr />
+
+                <h1>Guest Login to tour our atmosphere</h1>
+                @if (User.Identity.IsAuthenticated == false)
+                {
+
+
+                    <div class="buttons">
+                        <button class="btn btn-primary" ><i class="icon-bell icon-white"></i>Admin</button>
+                        <button class="btn btn-success" ><i class="icon-camera icon-white"></i>Project Manager</button>
+                        <button class="btn btn-danger" ><i class="icon-film icon-white"></i>Developer</button>
+                        <button class="btn btn-warning" ><i class="icon-book icon-white"></i>Submitter</button>
+
+                    </div>
+                }
+
+            </div><!--/fluid-row-->
+
+        </div>
+
+    </div><!--/.fluid-container-->
+    <!-- start: JavaScript-->
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery-1.9.1.min.js"></script>
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery-migrate-1.0.0.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery-ui-1.10.0.custom.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.ui.touch-punch.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/bootstrap.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.cookie.js"></script>
+
+    <script src='~/perfectum_dashboard_1_0_5/js/fullcalendar.min.js'></script>
+
+    <script src='~/perfectum_dashboard_1_0_5/js/jquery.dataTables.min.js'></script>
+    <script src="~/perfectum_dashboard_1_0_5/js/excanvas.js"></script>
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.flot.min.js"></script>
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.flot.pie.min.js"></script>
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.flot.stack.js"></script>
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.flot.resize.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.chosen.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.uniform.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.cleditor.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.noty.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.elfinder.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.raty.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.iphone.toggle.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.uploadify-3.1.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.gritter.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.imagesloaded.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.masonry.min.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.knob.js"></script>
+
+    <script src="~/perfectum_dashboard_1_0_5/js/jquery.sparkline.min.js"></script>
+    <script src="~/perfectum_dashboard_1_0_5/js/custom.js"></script>
+
+    <!-- end: JavaScript-->
+
+</body>
+</html>
+
+

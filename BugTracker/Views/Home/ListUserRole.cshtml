@@ -1,0 +1,51 @@
+﻿@model IEnumerable<BugTracker.Models.ApplicationUser>
+
+@{
+    ViewBag.Title = "BuggyTracker - List Users";
+}
+
+<div class="index-page">
+    <h1>Users</h1>
+
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+           
+            <th>
+                Username/Email
+            </th>
+
+            <th>
+                Control
+            </th>
+           
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+               
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+            
+                <td>
+                    @Html.ActionLink("EditUserRoles", "EditUserRoles", new { id = item.Id }, new { @class = "btn btn-primary" })
+                </td>
+                
+            </tr>
+        }
+
+    </table>
+</div>

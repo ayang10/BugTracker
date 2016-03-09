@@ -1,5 +1,4 @@
-﻿@*@model BugTracker.Models.AdminUserViewModel*@
-
+﻿@model BugTracker.Models.AdminEditRole
 @{
     ViewBag.Title = "BuggyTracker - EditUserRole";
 }
@@ -15,19 +14,23 @@
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
+        <b>You are about to edit: @Model.Users.UserName Role</b>
+        <hr />
         <div class="form-group">
-            <div class="col-sm-6">
-                @Html.DropDownList("RoleName", ViewBag.Roles as SelectList)
+            <div class="col-md-12">
+                @Html.DropDownListFor(r => r.SelectedRoles, Model.Roles, new { style = "width: 50%" })
+               
             </div>
         </div>
+        <br />
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </div>
     </div>
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("Back to List", "ListUserRole", null, new { @class ="btn btn-success"})
 </div>

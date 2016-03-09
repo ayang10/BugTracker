@@ -12,25 +12,25 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Projects.Title)
+            Project
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.UserId)
+            User
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.PriorityId)
+            Priority
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.TypeId)
+            Type
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.StatusId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Description)
+            Status
         </th>
         <th>
             @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Description)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.CreationDate)
@@ -41,34 +41,38 @@
         <th>
             @Html.DisplayNameFor(model => model.MediaUrl)
         </th>
+        <th>
+            Control
+        </th>
         <th></th>
     </tr>
 
 @foreach (var item in Model) {
     <tr>
         <td>
-            @Html.DisplayFor(modelItem => item.Projects.Title)
+            @item.Projects.Title
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.UserId)
+            @item.UserId
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.PriorityId)
+        
+            @Html.DisplayFor(modelItem => item.TicketPriorities.Name)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.TypeId)
+            @Html.DisplayFor(modelItem => item.TicketTypes.Name)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.StatusId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Description)
+            @Html.DisplayFor(modelItem => item.TicketStatuses.Name)
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.Title)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.CreationDate)
+            @Html.Raw(item.Description)
+        </td>
+        <td>
+            @item.CreationDate.ToString("D")
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.Updated)
@@ -77,9 +81,9 @@
             @Html.DisplayFor(modelItem => item.MediaUrl)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id }, new { @class="btn btn-warning"}) 
+            @Html.ActionLink("Details", "Details", new { id=item.Id }, new { @class = "btn btn-primary" }) 
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id }, new { @class = "btn btn-danger" })
         </td>
     </tr>
 }

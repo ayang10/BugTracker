@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -16,7 +18,7 @@ namespace BugTracker.Models
         }
 
         public int Id { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public int ProjectId { get; set; }
         public int PriorityId { get; set; }
         public int TypeId { get; set; }
@@ -39,13 +41,63 @@ namespace BugTracker.Models
         public virtual ICollection<TicketComment> TicketComments { get; set; }
         public virtual ICollection<TicketChange> TicketChanges { get; set; }
 
+        private int BodyTextLimit = 900;
+
+        public string BodyTextTrimmed
+        {
+            get
+            {
+                if (this.Description.Length > this.BodyTextLimit)
+                    return this.Description.Substring(0, this.BodyTextLimit) + "...";
+                else
+                    return this.Description;
+            }
+        }
+
+
+        public static class ImageUploadValidator
+        {
+            public static bool IsWebFriendlyImage(HttpPostedFileBase fileUpload)
+            {
+                //check for actual object
+                if (fileUpload == null)
+                    return false;
+
+                //check size - file must be  less than 2 MB and greater than 1 KB
+                if (fileUpload.ContentLength > 2 * 1024 * 1024)
+                    return false;
+
+                try
+                {
+                    using (var img = Image.FromStream(fileUpload.InputStream))
+                    {
+                        return ImageFormat.Jpeg.Equals(img.RawFormat) ||
+                               ImageFormat.Png.Equals(img.RawFormat) ||
+                               ImageFormat.Gif.Equals(img.RawFormat);
+                    }
+                }
+
+                catch
+                {
+
+                    return false;
+                }
+            }
+        }
+
+
 
     }
 
 
     public class Project
     {
-     
+
+        public Project()
+        {
+            this.AssignProjectUsers = new HashSet<ApplicationUser>();
+            this.Tickets = new HashSet<Ticket>();
+        }
         public int Id { get; set; }
         public string Title { get; set; }
 
@@ -55,10 +107,20 @@ namespace BugTracker.Models
         public string UserId { get; set; }
 
         public virtual ApplicationUser ProjectUsers { get; set; }
-
+        public virtual ICollection<ApplicationUser> AssignProjectUsers { get; set; }
+        public virtual ICollection<Ticket> Tickets { get; set; }
+        //public virtual ICollection<ApplicationUser> ProjectUsers { get; set; }
+      
 
     }
 
+    public class AssignProjectUser
+    {
+        public Project Project { get; set; } 
+        public MultiSelectList Users { get; set; }
+        public string[] SelectedUser { get; set; }
+
+    }
 
     public class TicketChange
     {
@@ -77,8 +139,8 @@ namespace BugTracker.Models
         public int PriorityId { get; set; }
         public int TypeId { get; set; }
         public int StatusId { get; set; }
-        public int NewDeveloperId { get; set; }
-        public int ChangeUserId { get; set; }
+        public string NewDeveloperId { get; set; }
+        public string ChangeUserId { get; set; }
         public DateTimeOffset ChangedDate { get; set; }
 
         public string MediaUrl { get; set; }
@@ -112,36 +174,42 @@ namespace BugTracker.Models
         public TicketPriority()
         {
             this.Tickets = new HashSet<Ticket>();
+            this.Projects = new HashSet<Project>();
         }
 
         public int Id { get; set; }
         public string Name { get; set; }
 
         public virtual ICollection<Ticket> Tickets { get; set; }
+        public virtual ICollection<Project> Projects { get; set; }
     }
     public class TicketType
     {
         public TicketType()
         {
             this.Tickets = new HashSet<Ticket>();
+            this.Projects = new HashSet<Project>();
         }
 
         public int Id { get; set; }
         public string Name { get; set; }
 
         public virtual ICollection<Ticket> Tickets { get; set; }
+        public virtual ICollection<Project> Projects { get; set; }
     }
     public class TicketStatus
     {
         public TicketStatus()
         {
             this.Tickets = new HashSet<Ticket>();
+            this.Projects = new HashSet<Project>();
         }
         public int Id { get; set; }
         public string Name { get; set; }
 
 
         public virtual ICollection<Ticket> Tickets { get; set; }
+        public virtual ICollection<Project> Projects { get; set; }
     }
 
     public class Notification
@@ -169,18 +237,17 @@ namespace BugTracker.Models
     }
 
 
-    //public class UserAndRole
-    //{
-    //    public int Id { get; set; }
-    //    public string Users { get; set; }
-    //    public string Roles { get; set; }
-    
-    //}
-
     public class DashboardViewModels
     {
         public ICollection<Project> Projects { get; set; }
         public ICollection<Ticket> Tickets { get; set; }
         public ICollection<Notification> Notifications { get; set; }
+    }
+
+    public class AdminEditRole
+    {
+        public ApplicationUser Users { get; set; }
+        public MultiSelectList Roles { get; set; }
+        public string[] SelectedRoles { get; set; }
     }
 }

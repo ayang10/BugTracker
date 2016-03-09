@@ -12,6 +12,13 @@ namespace BugTracker.Models
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string DisplayName { get; set; }
+
+        public ApplicationUser()
+        {
+            this.TicketComments = new HashSet<TicketComment>();
+            this.Projects = new HashSet<Project>();
+        }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
@@ -21,6 +28,8 @@ namespace BugTracker.Models
             return userIdentity;
         }
         public virtual ICollection<TicketComment> TicketComments { get; set; }
+        public virtual ICollection<Project> Projects { get; set; }
+
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>

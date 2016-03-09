@@ -7,6 +7,8 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using BugTracker.Models;
+using Microsoft.AspNet.Identity;
+using System.IO;
 
 namespace BugTracker.Controllers
 {
@@ -17,7 +19,9 @@ namespace BugTracker.Controllers
         // GET: Tickets
         public ActionResult Index()
         {
-            var tickets = db.Tickets.Include(t => t.Projects);
+            var tickets = db.Tickets.Include(t => t.Projects).Include(t => t.TicketPriorities).Include(t => t.TicketTypes).Include(t => t.TicketStatuses);
+
+            
             return View(tickets.ToList());
         }
 
@@ -40,6 +44,10 @@ namespace BugTracker.Controllers
         public ActionResult Create()
         {
             ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Title");
+            ViewBag.PriorityId = new SelectList(db.TicketPriorities, "Id", "Name");
+            ViewBag.TypeId = new SelectList(db.TicketTypes, "Id", "Name");
+            ViewBag.StatusId = new SelectList(db.TicketStatuses, "Id", "Name");
+
             return View();
         }
 
@@ -48,16 +56,38 @@ namespace BugTracker.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,UserId,ProjectId,PriorityId,TypeId,StatusId,Description,Title,CreationDate,Updated,MediaUrl")] Ticket ticket)
+        public ActionResult Create([Bind(Include = "Id,UserId,ProjectId,PriorityId,TypeId,StatusId,Description,Title,CreationDate,Updated,MediaUrl")] Ticket ticket, HttpPostedFileBase fileUpload)
         {
+            ticket.CreationDate = new DateTimeOffset(DateTime.Now);
+
             if (ModelState.IsValid)
             {
+                // restricting the valid file formats to images only
+                if (Ticket.ImageUploadValidator.IsWebFriendlyImage(fileUpload))
+                {
+                    var fileName = Path.GetFileName(fileUpload.FileName);
+                    fileUpload.SaveAs(Path.Combine(Server.MapPath("~/img/"), fileName));
+                    ticket.MediaUrl = "~/img/" + fileName;
+
+                }
+
+                var user = db.Users.Find(User.Identity.GetUserId());
+
+                ticket.UserId = user.UserName;
+              
+
+                ticket.CreationDate = new DateTimeOffset(DateTime.Now);
+
                 db.Tickets.Add(ticket);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
             ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Title", ticket.ProjectId);
+            ViewBag.PriorityId = new SelectList(db.TicketPriorities, "Id", "Name", ticket.PriorityId);
+            ViewBag.TypeId = new SelectList(db.TicketTypes, "Id", "Name", ticket.TypeId);
+            ViewBag.StatusId = new SelectList(db.TicketStatuses, "Id", "Name", ticket.StatusId);
+
             return View(ticket);
         }
 
@@ -74,6 +104,9 @@ namespace BugTracker.Controllers
                 return HttpNotFound();
             }
             ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Title", ticket.ProjectId);
+            ViewBag.PriorityId = new SelectList(db.TicketPriorities, "Id", "Name", ticket.PriorityId);
+            ViewBag.TypeId = new SelectList(db.TicketTypes, "Id", "Name", ticket.TypeId);
+            ViewBag.StatusId = new SelectList(db.TicketStatuses, "Id", "Name", ticket.StatusId);
             return View(ticket);
         }
 
@@ -82,15 +115,36 @@ namespace BugTracker.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,UserId,ProjectId,PriorityId,TypeId,StatusId,Description,Title,CreationDate,Updated,MediaUrl")] Ticket ticket)
+        public ActionResult Edit([Bind(Include = "Id,UserId,ProjectId,PriorityId,TypeId,StatusId,Description,Title,CreationDate,Updated,MediaUrl")] Ticket ticket, HttpPostedFileBase fileUpload)
         {
             if (ModelState.IsValid)
             {
+                var fetched = db.Tickets.Find(ticket.Id);
+                fetched.UserId = ticket.UserId;
+                fetched.TicketPriorities = ticket.TicketPriorities;
+                fetched.TicketTypes = ticket.TicketTypes;
+                fetched.TicketStatuses = ticket.TicketStatuses;
+
+
+                // restricting the valid file formats to images only
+                if (Ticket.ImageUploadValidator.IsWebFriendlyImage(fileUpload))
+                {
+                    var fileName = Path.GetFileName(fileUpload.FileName);
+                    fileUpload.SaveAs(Path.Combine(Server.MapPath("~/img/"), fileName));
+                    fetched.MediaUrl = "~/img/" + fileName;
+
+                }
+
+
+
                 db.Entry(ticket).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
             ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Title", ticket.ProjectId);
+            ViewBag.PriorityId = new SelectList(db.TicketPriorities, "Id", "Name", ticket.PriorityId);
+            ViewBag.TypeId = new SelectList(db.TicketTypes, "Id", "Name", ticket.TypeId);
+            ViewBag.StatusId = new SelectList(db.TicketStatuses, "Id", "Name", ticket.StatusId);
             return View(ticket);
         }
 

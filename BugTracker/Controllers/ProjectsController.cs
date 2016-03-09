@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using BugTracker.Models;
 using Microsoft.AspNet.Identity;
+using BugTracker.Helper;
 
 namespace BugTracker.Controllers
 {
@@ -18,6 +19,8 @@ namespace BugTracker.Controllers
         // GET: Projects
         public ActionResult Index()
         {
+
+
             return View(db.Projects.ToList());
         }
 
@@ -69,6 +72,55 @@ namespace BugTracker.Controllers
             return View(project);
         }
 
+        
+        //[Authorize(Roles = "Admin, ProjectManager")]
+        public ActionResult AssignUserView(int projectId)
+        {
+            
+            AssignProjectUser assignprojectuser = new AssignProjectUser();
+            UserProjectsHelper helper = new UserProjectsHelper();
+
+            var selected = helper.UsersInProject(projectId).Select(i => i.Id);
+            
+                assignprojectuser.Users = new MultiSelectList(db.Users, "Id", "FirstName", selected);
+       
+            assignprojectuser.Project = db.Projects.Find(projectId);
+
+            return View(assignprojectuser);
+        }
+
+        //POST: Edit Project Users
+        [HttpPost]
+        //[Authorize(Roles = "Admin, ProjectManager")]
+        public ActionResult AssignUserView(int projectId, AssignProjectUser assignuser)
+        {
+            UserProjectsHelper helper = new UserProjectsHelper();
+            var project = db.Projects.Find(projectId);
+
+            if (ModelState.IsValid)
+            {
+                string[] empty = { };
+                assignuser.SelectedUser = assignuser.SelectedUser ?? empty;
+
+                foreach (var user in db.Users)
+                {
+                    if (assignuser.SelectedUser.Contains(user.Id))
+                    {
+                        helper.AddUserToProject(user.Id, projectId);
+                      
+                    }
+                    else
+                    {
+                        helper.RemoveUserFromProject(user.Id, projectId);
+                      
+                    }
+                }
+                db.SaveChanges();
+            }
+
+            return RedirectToAction("Index", "Projects");
+        }
+
         // GET: Projects/Edit/5
         public ActionResult Edit(int? id)
         {
@@ -89,18 +141,31 @@ namespace BugTracker.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Title,Description,CreationDate,UserId")] Project project)
+        public ActionResult Edit([Bind(Include = "Id,Title,Description,CreationDate,UpdatedDate,UserId")] Project project)
         {
+            
+
             if (ModelState.IsValid)
             {
-
                 
-                db.Entry(project).State = EntityState.Modified;
+                
+                var fetched = db.Projects.Find(project.Id);
+
+                fetched.Title = project.Title;
+                fetched.Description = project.Description;
+                fetched.CreationDate = project.CreationDate;
+                fetched.UserId = project.UserId;
+              
+
+                db.Entry(fetched).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(project);
         }
+       
+
+       
 
         // GET: Projects/Delete/5
         public ActionResult Delete(int? id)

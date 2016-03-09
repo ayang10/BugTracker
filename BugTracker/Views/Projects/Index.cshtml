@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<BugTracker.Models.Project>
 
 @{
-    ViewBag.Title = "Project";
+    ViewBag.Title = "BuggyTracker - Project";
 }
 <br />
 <div class="main-content">
@@ -51,9 +51,10 @@
                                     </td>
                                   
                                     <td>
-                                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                                        @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-info" })
+                                        @*@Html.ActionLink("Details", "Details", new { id = item.Id }) |*@
+                                        @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" }) 
+                                        @Html.ActionLink("AssignUserToProject", "AssignUserView", new { projectId = item.Id}, new { @class ="btn btn-primary"})
 
 
 

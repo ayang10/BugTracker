@@ -54,24 +54,29 @@
             <div class="span2 main-menu-span">
                 <div class="nav-collapse sidebar-nav">
                     <ul class="nav nav-tabs nav-stacked ">
+
                         <li><a href="@Url.Action("Dashboard", "Home")"><i class="icon-home icon-white"></i><span class="hidden-tablet"> Dashboard</span></a></li>
-                        <li><a href="@Url.Action("EditUserRole", "Home")"><i class="icon-edit icon-white"></i><span class="hidden-tablet"> Edit Roles</span></a></li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                        <li><a href="@Url.Action("ListUserRole", "Home", "Admin")"><i class="icon-edit icon-white"></i><span class="hidden-tablet"> Edit Roles</span></a></li>
+                        }
                         <li>
                             <a class="dropmenu" href="#"><i class="fa-icon-folder-close-alt"></i><span class="hidden-tablet"> Project</span></a>
                             <ul>
+                                <li><a href="@Url.Action("Index", "Projects")"><i class="icon-eye-open icon-white"></i><span class="hidden-tablet"> Projects</span></a></li>
                                 <li><a href="@Url.Action("Create", "Projects")"><i class="icon-eye-open icon-white"></i><span class="hidden-tablet"> Create New Projects</span></a></li>
-                              
                             </ul>
                         </li>
                         <li>
                             <a class="dropmenu" href="#"><i class="icon-list-alt icon-white"></i><span class="hidden-tablet"> Ticket</span></a>
                             <ul>
+                                <li><a href="@Url.Action("Index", "Tickets")"><i class="icon-bullhorn icon-white"></i><span class="hidden-tablet"> Tickets</span></a></li>
                                 <li><a href="@Url.Action("Create", "Tickets")"><i class="icon-eye-open icon-white"></i><span class="hidden-tablet"> Create New Tickets</span></a></li>
 
                             </ul>
                         </li>
                         <li><a href="form.html"><i class="icon-edit icon-white"></i><span class="hidden-tablet"> Forms</span></a></li>
-                        <li><a href="chart.html"><i class="icon-list-alt icon-white"></i><span class="hidden-tablet"> Charts</span></a></li>
+                        @*<li><a href="chart.html"><i class="icon-list-alt icon-white"></i><span class="hidden-tablet"> Charts</span></a></li>
                         <li>
                             <a class="dropmenu" href="#"><i class="fa-icon-folder-close-alt"></i><span class="hidden-tablet"> Dropdown</span></a>
                             <ul>
@@ -87,7 +92,7 @@
                         <li><a href="grid.html"><i class="icon-th icon-white"></i><span class="hidden-tablet"> Grid</span></a></li>
                         <li><a href="file-manager.html"><i class="icon-folder-open icon-white"></i><span class="hidden-tablet"> File Manager</span></a></li>
                         <li><a href="icon.html"><i class="icon-star icon-white"></i><span class="hidden-tablet"> Icons</span></a></li>
-                        <li><a href="login.html"><i class="icon-lock icon-white"></i><span class="hidden-tablet"> Login Page</span></a></li>
+                        <li><a href="login.html"><i class="icon-lock icon-white"></i><span class="hidden-tablet"> Login Page</span></a></li>*@
                     </ul>
                 </div><!--/.well -->
             </div><!--/span-->

@@ -15,16 +15,18 @@ namespace BugTracker.Controllers
     public class ProjectsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-
+       
         // GET: Projects
+        [Authorize(Roles = "Admin")]
         public ActionResult Index()
         {
-
+            
 
             return View(db.Projects.ToList());
         }
 
         // GET: Projects/Details/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -40,6 +42,7 @@ namespace BugTracker.Controllers
         }
 
         // GET: Projects/Create
+        [Authorize(Roles = "Admin")]
         public ActionResult Create()
         {
             
@@ -52,6 +55,7 @@ namespace BugTracker.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public ActionResult Create([Bind(Include = "Id,Title,Description,CreationDate,UserId")] Project project)
         {
             project.CreationDate = new DateTimeOffset(DateTime.Now);
@@ -73,17 +77,22 @@ namespace BugTracker.Controllers
         }
 
         
-        //[Authorize(Roles = "Admin, ProjectManager")]
+        
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
         public ActionResult AssignUserView(int projectId)
         {
             
             AssignProjectUser assignprojectuser = new AssignProjectUser();
             UserProjectsHelper helper = new UserProjectsHelper();
+           
+            var select = helper.UsersInProject(projectId).Select(i => i.Id);
+            if (User.IsInRole("Admin"))
+            {
+                var users = helper.GetApplicationUsersInRole("ProjectManager");
 
-            var selected = helper.UsersInProject(projectId).Select(i => i.Id);
-            
-                assignprojectuser.Users = new MultiSelectList(db.Users, "Id", "FirstName", selected);
-       
+                assignprojectuser.Users = new MultiSelectList(users, "Id", "DisplayName", select);
+       }
             assignprojectuser.Project = db.Projects.Find(projectId);
 
             return View(assignprojectuser);
@@ -91,12 +100,11 @@ namespace BugTracker.Controllers
 
         //POST: Edit Project Users
         [HttpPost]
-        //[Authorize(Roles = "Admin, ProjectManager")]
+        [Authorize(Roles = "Admin")]
         public ActionResult AssignUserView(int projectId, AssignProjectUser assignuser)
         {
             UserProjectsHelper helper = new UserProjectsHelper();
-            var project = db.Projects.Find(projectId);
-
+           
             if (ModelState.IsValid)
             {
                 string[] empty = { };
@@ -122,6 +130,7 @@ namespace BugTracker.Controllers
         }
 
         // GET: Projects/Edit/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -141,6 +150,7 @@ namespace BugTracker.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit([Bind(Include = "Id,Title,Description,CreationDate,UpdatedDate,UserId")] Project project)
         {
             
@@ -163,11 +173,12 @@ namespace BugTracker.Controllers
             }
             return View(project);
         }
-       
 
-       
+
+
 
         // GET: Projects/Delete/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -185,6 +196,7 @@ namespace BugTracker.Controllers
         // POST: Projects/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public ActionResult DeleteConfirmed(int id)
         {
             Project project = db.Projects.Find(id);

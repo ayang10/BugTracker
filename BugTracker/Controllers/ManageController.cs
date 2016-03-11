@@ -88,8 +88,10 @@ namespace BugTracker.Controllers
 
             name.FirstName = user.FirstName;
             name.LastName = user.LastName;
+            name.DisplayName = user.DisplayName;
             name.Email = user.Email;
             
+
             return View(name);
         }
 
@@ -117,6 +119,7 @@ namespace BugTracker.Controllers
             {
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
+                user.DisplayName = model.DisplayName;
                 user.Email = model.Email;
                 user.UserName = model.Email;
 
@@ -130,6 +133,7 @@ namespace BugTracker.Controllers
             {
                 existingUser.FirstName = model.FirstName;
                 existingUser.LastName = model.LastName;
+                existingUser.DisplayName = model.DisplayName;
 
                 db.SaveChanges();
 

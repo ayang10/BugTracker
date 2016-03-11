@@ -318,11 +318,13 @@ h6 {
 
 .box {
 	margin: 20px 0px;
+    
 }
 
 
 .box-header {
 	height: 20px;
+    width: 100%;
   	border: 1px solid #ddd;
 	margin-bottom: -1px;
   	padding: 10px;
@@ -340,6 +342,7 @@ h6 {
        -moz-border-radius: 2px 2px 0px 0px;
           	border-radius: 2px 2px 0px 0px;
 	overflow: hidden;
+    
 }
 
 .box-header h2{
@@ -389,6 +392,7 @@ h6 {
 
 .box-content {
   	margin-top: -1px;
+      width: 100%;
 	padding: 10px;
   	border: 1px solid #ddd;
   	background: #fcfcfc;
@@ -2386,3 +2390,4 @@ footer p {
           margin: 5px; }
 
 
+ 

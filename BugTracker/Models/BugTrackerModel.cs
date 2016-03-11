@@ -15,6 +15,7 @@ namespace BugTracker.Models
         {
             this.TicketComments = new HashSet<TicketComment>();
             this.TicketChanges = new HashSet<TicketChange>();
+            this.AssignTicketUsers = new HashSet<ApplicationUser>();
         }
 
         public int Id { get; set; }
@@ -29,17 +30,18 @@ namespace BugTracker.Models
         public string Title { get; set; }
 
         public DateTimeOffset CreationDate { get; set; }
-        public DateTimeOffset? Updated { get; set; }
         public string MediaUrl { get; set; }
 
-        public virtual ApplicationUser EntryUser { get; set; }
-        public virtual TicketPriority TicketPriorities { get; set; }
-        public virtual TicketType TicketTypes { get; set; }
-        public virtual TicketStatus TicketStatuses { get; set; }
-        public virtual Project Projects { get; set; }
+        //public virtual ApplicationUser EntryUser { get; set; }
+        public virtual TicketPriority Priority { get; set; }
+        public virtual TicketType Type { get; set; }
+        public virtual TicketStatus Status { get; set; } 
+        public virtual Project Project { get; set; }
 
         public virtual ICollection<TicketComment> TicketComments { get; set; }
         public virtual ICollection<TicketChange> TicketChanges { get; set; }
+
+        public virtual ICollection<ApplicationUser> AssignTicketUsers { get; set; }
 
         private int BodyTextLimit = 900;
 
@@ -105,8 +107,7 @@ namespace BugTracker.Models
         public string Description { get; set; }
         public DateTimeOffset CreationDate { get; set; }
         public string UserId { get; set; }
-
-        public virtual ApplicationUser ProjectUsers { get; set; }
+        
         public virtual ICollection<ApplicationUser> AssignProjectUsers { get; set; }
         public virtual ICollection<Ticket> Tickets { get; set; }
         //public virtual ICollection<ApplicationUser> ProjectUsers { get; set; }
@@ -120,6 +121,14 @@ namespace BugTracker.Models
         public MultiSelectList Users { get; set; }
         public string[] SelectedUser { get; set; }
 
+    }
+
+    public class AssignTicketUser
+    {
+        public Ticket Ticket { get; set; }
+        public MultiSelectList ProjectManagerUsers { get; set; }
+        public MultiSelectList DeveloperManagerUsers { get; set; }
+        public string[] SelectedUser { get; set; }
     }
 
     public class TicketChange
@@ -156,6 +165,11 @@ namespace BugTracker.Models
 
     public class TicketComment
     {
+        public TicketComment()
+        {
+            this.TicketComments = new HashSet<TicketComment>();
+        }
+
         public int Id { get; set; }
         public int TicketId { get; set; }
         public string UserId { get; set; }
@@ -164,8 +178,10 @@ namespace BugTracker.Models
         [AllowHtml]
         public string Body { get; set; }
 
-        public virtual Ticket Tickets { get; set; }
+        public virtual Ticket Ticket { get; set; }
         public virtual ApplicationUser User { get; set; }
+
+        public virtual ICollection<TicketComment> TicketComments { get; set; }
 
     }
      
@@ -242,6 +258,7 @@ namespace BugTracker.Models
         public ICollection<Project> Projects { get; set; }
         public ICollection<Ticket> Tickets { get; set; }
         public ICollection<Notification> Notifications { get; set; }
+        public AssignProjectUser AssignProjectUsers { get; set; }
     }
 
     public class AdminEditRole

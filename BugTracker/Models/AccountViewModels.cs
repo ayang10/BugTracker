@@ -64,7 +64,7 @@ namespace BugTracker.Models
 
     public class RegisterViewModel
     {
-        //add name
+        //add first name
         [Required]
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
@@ -73,6 +73,12 @@ namespace BugTracker.Models
         [Required]
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
+
+        //add full name
+        [Required]
+        [Display(Name = "Display Name")]
+        public string DisplayName { get; set; }
+
 
         [Required]
         [EmailAddress]

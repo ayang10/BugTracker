@@ -14,21 +14,33 @@
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-        <b>You are about to edit: @Model.Users.UserName Role</b>
-        <hr />
-        <div class="form-group">
-            <div class="col-md-12">
-                @Html.DropDownListFor(r => r.SelectedRoles, Model.Roles, new { style = "width: 50%" })
-               
+        <b>You are about to edit: @Model.Users.UserName </b>
+        <p>
+            <b>Role of User:</b>
+
+            @foreach (var item in Model.Roles)
+            {
+                if (item.Selected)
+                {
+                    <br />
+                   <b class="red"> @Html.DisplayFor(m => item.Text)</b>
+
+                }
+            }
+            <hr />
+            <div class="form-group">
+                <div class="col-md-12">
+                    @Html.DropDownListFor(r => r.SelectedRoles, Model.Roles, new { style = "width: 50%" })
+
+                </div>
             </div>
-        </div>
-        <br />
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-primary" />
+            <br />
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
             </div>
-        </div>
-    </div>
+</div>
 }
 
 <div>

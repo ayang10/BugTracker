@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using BugTracker.Models;
 using Microsoft.AspNet.Identity;
 using System.IO;
+using BugTracker.Helper;
 
 namespace BugTracker.Controllers
 {
@@ -19,10 +20,10 @@ namespace BugTracker.Controllers
         // GET: Tickets
         public ActionResult Index()
         {
-            var tickets = db.Tickets.Include(t => t.Projects).Include(t => t.TicketPriorities).Include(t => t.TicketTypes).Include(t => t.TicketStatuses);
-
+            var tickets = db.Tickets.Include(t => t.Project).Include(t => t.Priority).Include(t => t.Type).Include(t => t.Status).ToList();
             
-            return View(tickets.ToList());
+            
+            return View(tickets);
         }
 
         // GET: Tickets/Details/5
@@ -43,6 +44,7 @@ namespace BugTracker.Controllers
         // GET: Tickets/Create
         public ActionResult Create()
         {
+            
             ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Title");
             ViewBag.PriorityId = new SelectList(db.TicketPriorities, "Id", "Name");
             ViewBag.TypeId = new SelectList(db.TicketTypes, "Id", "Name");
@@ -56,7 +58,7 @@ namespace BugTracker.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,UserId,ProjectId,PriorityId,TypeId,StatusId,Description,Title,CreationDate,Updated,MediaUrl")] Ticket ticket, HttpPostedFileBase fileUpload)
+        public ActionResult Create([Bind(Include = "Id,UserId,ProjectId,PriorityId,TypeId,StatusId,Description,Title,CreationDate,MediaUrl")] Ticket ticket, HttpPostedFileBase fileUpload)
         {
             ticket.CreationDate = new DateTimeOffset(DateTime.Now);
 
@@ -91,6 +93,71 @@ namespace BugTracker.Controllers
             return View(ticket);
         }
 
+
+        [HttpGet]
+        [Authorize(Roles = "Admin, ProjectManager")]
+        public ActionResult AssignTicket(int ticketId)
+        {
+
+            AssignTicketUser assignticketuser = new AssignTicketUser();
+            UserTicketsHelper helper = new UserTicketsHelper();
+
+            var select = helper.UsersInTicket(ticketId).Select(i => i.Id);
+
+            var projectManagerUser = helper.GetApplicationUsersInRole("ProjectManager");
+
+            var developerUsers = helper.GetApplicationUsersInRole("Developer");
+
+            if (User.IsInRole("Admin"))
+            {
+                
+                assignticketuser.ProjectManagerUsers = new MultiSelectList(projectManagerUser, "Id", "DisplayName", select);
+
+                assignticketuser.DeveloperManagerUsers = new MultiSelectList(developerUsers, "Id", "DisplayName", select);
+
+            }
+            else if (User.IsInRole("ProjectManager"))
+            {
+                assignticketuser.DeveloperManagerUsers = new MultiSelectList(developerUsers, "Id", "DisplayName", select);
+            }
+
+            assignticketuser.Ticket = db.Tickets.Find(ticketId);
+
+            return View(assignticketuser);
+        }
+
+        //POST: Edit Project Users
+        [HttpPost]
+        [Authorize(Roles = "Admin, ProjectManager")]
+        public ActionResult AssignTicket(int ticketId, AssignTicketUser assignuser)
+        {
+            UserTicketsHelper helper = new UserTicketsHelper();
+
+            if (ModelState.IsValid)
+            {
+                string[] empty = { };
+                assignuser.SelectedUser = assignuser.SelectedUser ?? empty;
+
+                foreach (var user in db.Users)
+                {
+                    if (assignuser.SelectedUser.Contains(user.Id))
+                    {
+                        helper.AddUserToTicket(user.Id, ticketId);
+
+                    }
+                    else
+                    {
+                        helper.RemoveUserFromTicket(user.Id, ticketId);
+
+                    }
+                }
+                db.SaveChanges();
+            }
+
+            return RedirectToAction("Index", "Tickets");
+        }
+
+
         // GET: Tickets/Edit/5
         public ActionResult Edit(int? id)
         {
@@ -115,16 +182,18 @@ namespace BugTracker.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,UserId,ProjectId,PriorityId,TypeId,StatusId,Description,Title,CreationDate,Updated,MediaUrl")] Ticket ticket, HttpPostedFileBase fileUpload)
+        public ActionResult Edit([Bind(Include = "Id,UserId,ProjectId,PriorityId,TypeId,StatusId,Description,Title,CreationDate,MediaUrl")] Ticket ticket, HttpPostedFileBase fileUpload)
         {
             if (ModelState.IsValid)
             {
                 var fetched = db.Tickets.Find(ticket.Id);
                 fetched.UserId = ticket.UserId;
-                fetched.TicketPriorities = ticket.TicketPriorities;
-                fetched.TicketTypes = ticket.TicketTypes;
-                fetched.TicketStatuses = ticket.TicketStatuses;
-
+                fetched.Priority = ticket.Priority;
+                fetched.Type = ticket.Type;
+                fetched.Status = ticket.Status;
+                fetched.MediaUrl = ticket.MediaUrl;
+                fetched.Title = ticket.Title;
+                fetched.Description = ticket.Description;
 
                 // restricting the valid file formats to images only
                 if (Ticket.ImageUploadValidator.IsWebFriendlyImage(fileUpload))
@@ -137,7 +206,7 @@ namespace BugTracker.Controllers
 
 
 
-                db.Entry(ticket).State = EntityState.Modified;
+                db.Entry(fetched).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }

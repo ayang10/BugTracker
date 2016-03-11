@@ -188,6 +188,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ProjectsController.cs" />
+    <Compile Include="Controllers\TicketCommentsController.cs" />
     <Compile Include="Controllers\TicketsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -208,6 +209,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="img\accomplishments.jpg" />
     <Content Include="perfectum_dashboard_1_0_5\calendar.html" />
     <Content Include="perfectum_dashboard_1_0_5\chart.html" />
     <Content Include="perfectum_dashboard_1_0_5\css\bootstrap-responsive.css" />
@@ -230,6 +232,7 @@
     <Content Include="perfectum_dashboard_1_0_5\css\style-ie.css" />
     <Content Include="perfectum_dashboard_1_0_5\css\style-responsive.css" />
     <Content Include="perfectum_dashboard_1_0_5\css\style.css" />
+    <Content Include="perfectum_dashboard_1_0_5\css\style1.css" />
     <Content Include="perfectum_dashboard_1_0_5\css\uniform.default.css" />
     <Content Include="perfectum_dashboard_1_0_5\css\uploadify.css" />
     <Content Include="perfectum_dashboard_1_0_5\file-manager.html" />
@@ -305,6 +308,8 @@
     <Content Include="perfectum_dashboard_1_0_5\img\ladybug-line.gif" />
     <Content Include="perfectum_dashboard_1_0_5\img\logo.png" />
     <Content Include="perfectum_dashboard_1_0_5\img\logo20.png" />
+    <Content Include="perfectum_dashboard_1_0_5\img\meeple_anon.png" />
+    <Content Include="perfectum_dashboard_1_0_5\img\No_Image_Available.png" />
     <Content Include="perfectum_dashboard_1_0_5\img\progress.gif" />
     <Content Include="perfectum_dashboard_1_0_5\img\quicklook-bg.png" />
     <Content Include="perfectum_dashboard_1_0_5\img\quicklook-icons.png" />
@@ -441,10 +446,16 @@
     <Content Include="Views\Tickets\Details.cshtml" />
     <Content Include="Views\Tickets\Edit.cshtml" />
     <Content Include="Views\Tickets\Index.cshtml" />
+    <Content Include="Views\TicketComments\Create.cshtml" />
+    <Content Include="Views\TicketComments\Delete.cshtml" />
+    <Content Include="Views\TicketComments\Details.cshtml" />
+    <Content Include="Views\TicketComments\Edit.cshtml" />
+    <Content Include="Views\TicketComments\Index.cshtml" />
+    <Content Include="Views\Shared\_TicketComments.cshtml" />
+    <Content Include="Views\Tickets\AssignTicket.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Role\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

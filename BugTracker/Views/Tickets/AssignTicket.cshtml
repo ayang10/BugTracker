@@ -1,0 +1,86 @@
+﻿@model BugTracker.Models.AssignTicketUser
+
+@{
+    ViewBag.Title = "BuggyTracker - Project";
+}
+
+
+<h2>Assign Users</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Ticket</h4>
+        <hr />
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @if (User.IsInRole("Admin"))
+        {
+            <b>Assign Users to Ticket: @Model.Ticket.Title</b>
+
+            <p>
+                <b>Selected Project Manager Users:</b>
+
+                @foreach (var item in Model.ProjectManagerUsers)
+                {
+                    if (item.Selected)
+                    {
+                        <br />
+                        <b class="red">@Html.DisplayFor(m => item.Text)</b>
+
+                    }
+                }
+
+            </p>
+            <hr />
+            <div class="form-group">
+                <div class="col-md-12">
+                    @Html.ListBoxFor(r => r.SelectedUser, Model.ProjectManagerUsers, new { style = "width: 50%", size = 10 })
+
+                </div>
+            </div>
+
+            <br />
+        }
+        @if (User.IsInRole("Admin") || (User.IsInRole("ProjectManager")))
+        {
+
+
+            <p>
+                <b>Selected Developer Users:</b>
+
+                @foreach (var item in Model.DeveloperManagerUsers)
+                {
+                    if (item.Selected)
+                    {
+                        <br />
+                        <b class="red">@Html.DisplayFor(m => item.Text)</b>
+
+                    }
+                }
+
+            </p>
+            <hr />
+            <div class="form-group">
+                <div class="col-md-12">
+                    @Html.ListBoxFor(r => r.SelectedUser, Model.DeveloperManagerUsers, new { style = "width: 50%", size = 10 })
+
+                </div>
+            </div>
+
+        <br />
+        }
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+}
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-success" })
+</div>

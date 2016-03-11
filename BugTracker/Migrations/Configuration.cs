@@ -135,7 +135,8 @@ namespace BugTracker.Migrations
                     UserName = "buggytracker1@gmail.com",
                     Email = "buggytracker1@gmail.com",
                     FirstName = "A",
-                    LastName = "Yang"
+                    LastName = "Yang",
+                    DisplayName = "A Yang"
                 }, "Password-1");
             }
             //assign me to the Admin role, if not already in it
@@ -153,7 +154,8 @@ namespace BugTracker.Migrations
                     UserName = "bdavis@coderfoundry",
                     Email = "bdavis@coderfoundry.com",
                     FirstName = "Bobby",
-                    LastName = "Davis"
+                    LastName = "Davis",
+                    DisplayName = "Bobby Davis"
                 }, "Password-1");
             }
             //assign me to the Admin role, if not already in it
@@ -172,7 +174,8 @@ namespace BugTracker.Migrations
                     UserName = "ajensen@coderfoundry.com",
                     Email = "ajensen@coderfoundry.com",
                     FirstName = "Andrew",
-                    LastName = "Jensen"
+                    LastName = "Jensen",
+                    DisplayName = "Andrew Jensen"
                 }, "Password-1");
             }
 
@@ -192,7 +195,8 @@ namespace BugTracker.Migrations
                     UserName = "ramanglani@coderfoundry.com",
                     Email = "ramanglani@coderfoundry.com",
                     FirstName = "Ria",
-                    LastName = "Manglani"
+                    LastName = "Manglani",
+                    DisplayName = "Ria Manglani"
                 }, "Password-1");
             }
 
@@ -212,7 +216,8 @@ namespace BugTracker.Migrations
                     UserName = "tjones@coderfoundry.com",
                     Email = "tjones@coderfoundry.com",
                     FirstName = "TJ",
-                    LastName = "Jones"
+                    LastName = "Jones",
+                    DisplayName = "TJ Jones"
                 }, "Password-1");
             }
 

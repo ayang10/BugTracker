@@ -75,8 +75,8 @@ namespace BugTracker.Helper
         public bool IsUserInProject(string userId, int projectId)
         {
             return db.Users.Find(userId).Projects.Any(p => p.Id == projectId);
-            
         }
+
         public IList<Project> ListUserProjects(string userId)
         {
             var user = db.Users.Find(userId);
@@ -93,7 +93,6 @@ namespace BugTracker.Helper
                 db.Entry(project).State = EntityState.Modified;
                 db.SaveChanges();
                 return true;
-                
             }
             else
             {
@@ -118,28 +117,28 @@ namespace BugTracker.Helper
             }
         }
 
+      
+
         public IList<ApplicationUser> UsersInProject(int projectId)
         {
             var resultList = new List<ApplicationUser>();
-
-
+            
+               
             foreach (var user in db.Users.ToList())
             {
                 if (IsUserInProject(user.Id, projectId))
                 {
                     resultList.Add(user);
-                    db.SaveChanges();
                 }
             }
             return resultList;
-
         }
 
         public IList<ApplicationUser> UsersNotInProject(int projectId)
         {
             var resultList = new List<ApplicationUser>();
 
-            foreach (var user in db.Users)
+            foreach (var user in db.Users.ToList())
             {
                 if (!IsUserInProject(user.Id, projectId))
                 {
@@ -148,7 +147,110 @@ namespace BugTracker.Helper
             }
             return resultList;
         }
+
+        public IEnumerable<ApplicationUser> GetApplicationUsersInRole(string roleName)
+        {
+            return from role in db.Roles
+                   where role.Name == roleName
+                   from userRoles in role.Users
+                   join user in db.Users
+                   on userRoles.UserId equals user.Id
+                  
+                   select user;
+        }
     }
 
+    //Tickets
+    public class UserTicketsHelper
+    {
+        private ApplicationDbContext db = new ApplicationDbContext();
 
+        public bool IsUserInTicket(string userId, int ticketId)
+        {
+            return db.Users.Find(userId).Tickets.Any(p => p.Id == ticketId);
+        }
+
+        public IList<Ticket> ListUserTickets(string userId)
+        {
+            var user = db.Users.Find(userId);
+            return user.Tickets.ToList();
+        }
+
+        public bool AddUserToTicket(string userId, int ticketId)
+        {
+            var user = db.Users.Find(userId);
+            var ticket = db.Tickets.Find(ticketId);
+            if (!IsUserInTicket(userId, ticketId))
+            {
+                ticket.AssignTicketUsers.Add(user);
+                db.Entry(ticket).State = EntityState.Modified;
+                db.SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool RemoveUserFromTicket(string userId, int ticketId)
+        {
+            var user = db.Users.Find(userId);
+            var ticket = db.Tickets.Find(ticketId);
+            if (IsUserInTicket(userId, ticketId))
+            {
+                ticket.AssignTicketUsers.Remove(user);
+                db.Entry(ticket).State = EntityState.Modified;
+                db.SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
+
+        public IList<ApplicationUser> UsersInTicket(int ticketId)
+        {
+            var resultList = new List<ApplicationUser>();
+
+
+            foreach (var user in db.Users.ToList())
+            {
+                if (IsUserInTicket(user.Id, ticketId))
+                {
+                    resultList.Add(user);
+                }
+            }
+            return resultList;
+        }
+
+        public IList<ApplicationUser> UsersNotInTicket(int ticketId)
+        {
+            var resultList = new List<ApplicationUser>();
+
+            foreach (var user in db.Users.ToList())
+            {
+                if (!IsUserInTicket(user.Id, ticketId))
+                {
+                    resultList.Add(user);
+                }
+            }
+            return resultList;
+        }
+
+        public IEnumerable<ApplicationUser> GetApplicationUsersInRole(string roleName)
+        {
+            return from role in db.Roles
+                   where role.Name == roleName
+                   from userRoles in role.Users
+                   join user in db.Users
+                   on userRoles.UserId equals user.Id
+
+                   select user;
+        }
+    }
+ 
 }

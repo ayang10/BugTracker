@@ -16,11 +16,24 @@
         <hr />
 
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        <b>Assign Users to Project</b>
+        <b>Assign Users to Project: @Model.Project.Title</b>
+        
+        <p><b>Selected Users:</b>
+           
+        @foreach(var item in Model.Users)
+        {
+            if (item.Selected) {
+                <br />
+                <b class="red">@Html.DisplayFor(m => item.Text)</b>
+
+            }
+        }
+
+        </p>
         <hr />
         <div class="form-group">
             <div class="col-md-12">
-                @Html.ListBoxFor(r => r.SelectedUser, Model.Users, new { style = "width: 50%" })
+                @Html.ListBoxFor(r => r.SelectedUser, Model.Users, new { style = "width: 50%", size = 10 })
 
             </div>
         </div>

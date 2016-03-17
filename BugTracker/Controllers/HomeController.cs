@@ -3,6 +3,7 @@ using BugTracker.Models;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -28,37 +29,98 @@ namespace BugTracker.Controllers
             
             if (User.IsInRole("Admin"))
             {
-
-
+                
                 model.Projects = db.Projects.ToList();
-
                 model.Tickets = db.Tickets.ToList();
+                model.Notifications = db.Notifications.ToList();
+               
+           
                 return View(model);
 
             }
             else if (User.IsInRole("ProjectManager"))
             {
-               
-                var userProjects = new List<Project>();
-                var projects = db.Projects.ToList();
-                foreach (var project in projects)
-                {
-                    foreach (var u in project.AssignProjectUsers)
-                    {
-                        if (u.Id == user.Id)
-                        {
-                            userProjects.Add(project);
+                
 
-                            
-                        }
-                    }
-                }
+                //var userProjects = new List<Project>();
+                //var projects = db.Projects.ToList();
 
+                //List<Project> da = db.Projects.SelectMany(u => u.AssignProjectUsers).Where(u => u.Id == user.Id).Select(u => db.Projects).ToList();
+                List<Project> userProjects = (from project in db.Projects.ToList()
+                                           from u in project.AssignProjectUsers
+                                           where u.Id == user.Id
+                                           select project).ToList();
 
-                model.Projects = userProjects.ToList();
+                //foreach (var project in projects)
+                //{
+                //    foreach (var u in project.AssignProjectUsers)
+                //    {
+                //        if (u.Id == user.Id)
+                //        {
+                //            userProjects.Add(project);
+                //        }
+                //    }
+                //}
+
+                model.Notifications = db.Notifications.Where(u => u.RecipientUserId == user.Id).ToList();
+                model.Projects = userProjects;
                 model.Tickets = db.Tickets.ToList();
                 return View(model);
 
+            }
+            else if (User.IsInRole("Developer"))
+            {
+                //var userTickets = new List<Ticket>();
+                //var tickets = db.Tickets.ToList();
+
+                //var userProjects = new List<Project>();
+                //var projects = db.Projects.ToList();
+
+                List<Project> userProjects = (from project in db.Projects.ToList()
+                                           from u in project.AssignProjectUsers
+                                           where u.Id == user.Id
+                                           select project).ToList();
+
+                //foreach (var project in projects)
+                //{
+                //    foreach (var u in project.AssignProjectUsers)
+                //    {
+                //        if (u.Id == user.Id)
+                //        {
+                //            userProjects.Add(project);
+                //        }
+                //    }
+                //}
+                List<Ticket> userTickets = (from ticket in db.Tickets.ToList()
+                                           from u in ticket.AssignTicketUsers
+                                           where u.Id == user.Id
+                                           select ticket).ToList();
+
+                //foreach (var ticket in tickets)
+                //{
+                //    foreach (var u in ticket.AssignTicketUsers)
+                //    {
+                //        if (u.Id == user.Id)
+                //        {
+                //            userTickets.Add(ticket);
+                //        }
+                //    }
+                //}
+                model.Notifications = db.Notifications.Where(u => u.RecipientUserId == user.Id).ToList();
+                model.Projects = userProjects;
+                model.Tickets = userTickets;
+
+                return View(model);
+            }
+            else if (User.IsInRole("Submitter"))
+            {
+                var tickets = db.Tickets.Where(t => t.UserId == user.UserName);
+
+                model.Tickets = tickets.ToList();
+
+                model.Notifications = db.Notifications.Where(u => u.RecipientUserId == user.Id).ToList();
+
+                return View(model);
             }
             else
             {

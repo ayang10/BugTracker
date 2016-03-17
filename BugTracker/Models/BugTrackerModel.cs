@@ -14,7 +14,7 @@ namespace BugTracker.Models
         public Ticket()
         {
             this.TicketComments = new HashSet<TicketComment>();
-            this.TicketChanges = new HashSet<TicketChange>();
+            this.TicketHistories = new HashSet<TicketHistory>();
             this.AssignTicketUsers = new HashSet<ApplicationUser>();
         }
 
@@ -24,37 +24,40 @@ namespace BugTracker.Models
         public int PriorityId { get; set; }
         public int TypeId { get; set; }
         public int StatusId { get; set;}
+        public string AssignedToUserId { get; set; }
+
 
         [AllowHtml]
         public string Description { get; set; }
         public string Title { get; set; }
 
         public DateTimeOffset CreationDate { get; set; }
-        public string MediaUrl { get; set; }
+        public string Attachment { get; set; }
 
         //public virtual ApplicationUser EntryUser { get; set; }
         public virtual TicketPriority Priority { get; set; }
         public virtual TicketType Type { get; set; }
         public virtual TicketStatus Status { get; set; } 
         public virtual Project Project { get; set; }
-
+        
+    
         public virtual ICollection<TicketComment> TicketComments { get; set; }
-        public virtual ICollection<TicketChange> TicketChanges { get; set; }
-
+        public virtual ICollection<TicketHistory> TicketHistories { get; set; }
+        
         public virtual ICollection<ApplicationUser> AssignTicketUsers { get; set; }
 
-        private int BodyTextLimit = 900;
+        //private int BodyTextLimit = 200;
 
-        public string BodyTextTrimmed
-        {
-            get
-            {
-                if (this.Description.Length > this.BodyTextLimit)
-                    return this.Description.Substring(0, this.BodyTextLimit) + "...";
-                else
-                    return this.Description;
-            }
-        }
+        //public string BodyTextTrimmed
+        //{
+        //    get
+        //    {
+        //        if (this.Description.Length > this.BodyTextLimit)
+        //            return this.Description.Substring(0, this.BodyTextLimit) + "...";
+        //        else
+        //            return this.Description;
+        //    }
+        //}
 
 
         public static class ImageUploadValidator
@@ -107,7 +110,23 @@ namespace BugTracker.Models
         public string Description { get; set; }
         public DateTimeOffset CreationDate { get; set; }
         public string UserId { get; set; }
-        
+
+
+
+        //private int BodyTextLimit = 200;
+
+        //public string BodyTextTrimmed
+        //{
+        //    get
+        //    {
+        //        if (this.Description.Length > this.BodyTextLimit)
+        //            return this.Description.Substring(0, this.BodyTextLimit) + "...";
+        //        else
+        //            return this.Description;
+        //    }
+        //}
+
+
         public virtual ICollection<ApplicationUser> AssignProjectUsers { get; set; }
         public virtual ICollection<Ticket> Tickets { get; set; }
         //public virtual ICollection<ApplicationUser> ProjectUsers { get; set; }
@@ -119,6 +138,7 @@ namespace BugTracker.Models
     {
         public Project Project { get; set; } 
         public MultiSelectList Users { get; set; }
+        public MultiSelectList DeveloperUsers { get; set; }
         public string[] SelectedUser { get; set; }
 
     }
@@ -131,15 +151,15 @@ namespace BugTracker.Models
         public string[] SelectedUser { get; set; }
     }
 
-    public class TicketChange
+    public class TicketHistory
     {
-        public TicketChange()
+       public TicketHistory()
         {
-           
             this.Projects = new HashSet<Project>();
         }
         
         public int Id { get; set; }
+        public int ProjectId { get; set; }
         public string Title { get; set; }
 
         [AllowHtml]
@@ -148,19 +168,40 @@ namespace BugTracker.Models
         public int PriorityId { get; set; }
         public int TypeId { get; set; }
         public int StatusId { get; set; }
-        public string NewDeveloperId { get; set; }
-        public string ChangeUserId { get; set; }
+        public string UserId { get; set; }
+        public string EditId { get; set; }
+        public string Property { get; set; }
+        public string Old { get; set; }
+        public string OldValue { get; set; }
+        public string New { get; set; }
+        public string NewValue { get; set; }
+        
         public DateTimeOffset ChangedDate { get; set; }
 
         public string MediaUrl { get; set; }
+        public string NewMediaUrl { get; set; }
 
-        public virtual ApplicationUser ChangeUser { get; set; } 
-        public virtual Ticket Tickets { get; set; }
+
+        //private int BodyTextLimit = 600;
+
+        //public string BodyTextTrimmed
+        //{
+        //    get
+        //    {
+        //        if (this.Description.Length > this.BodyTextLimit)
+        //            return this.Description.Substring(0, this.BodyTextLimit) + "...";
+        //        else
+        //            return this.Description;
+        //    }
+        //}
+        
+        public virtual ApplicationUser Users { get; set; }
+        public virtual Ticket Ticket { get; set; }
         public virtual TicketPriority TicketPriorities { get; set; }
         public virtual TicketType TicketTypes { get; set; }
         public virtual TicketStatus TicketStatuses { get; set; }
+        public virtual ApplicationUser User { get; set; }
         public virtual ICollection<Project> Projects { get; set; }
-
     }
 
     public class TicketComment
@@ -259,6 +300,7 @@ namespace BugTracker.Models
         public ICollection<Ticket> Tickets { get; set; }
         public ICollection<Notification> Notifications { get; set; }
         public AssignProjectUser AssignProjectUsers { get; set; }
+        public AssignTicketUser AssignTicketusers { get; set; }
     }
 
     public class AdminEditRole

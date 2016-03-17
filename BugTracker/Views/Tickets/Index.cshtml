@@ -13,7 +13,7 @@
             <!-- Heading -->
             <div class="single-head">
                 <!-- Heading -->
-                <h1 class="pull-left"><i class="fa fa-table purple"></i> Tickets</h1>
+                <h1 class="pull-left"><i class="fa fa-icon-leaf green"></i> Tickets</h1>
 
                 <div class="pull-right">@Html.ActionLink("Create new Tickets", "Create", null, new { @class = "btn btn-primary" })</div>
                 <div class="clearfix"></div>
@@ -71,9 +71,9 @@
                                     </td>
                                  
                                     <td>
-                                        @if (item.MediaUrl != null)
+                                        @if (item.Attachment != null)
                                         {
-                                        <img src="@Url.Content(item.MediaUrl)" class="thumbnail" alt="" width="100" height="100" />
+                                        <img src="@Url.Content(item.Attachment)" class="thumbnail" alt="" width="100" height="100" />
                                         }
                                         else
                                         {
@@ -81,13 +81,34 @@
                                         }
                                     </td>
                                     <td>
-                                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-warning" })
-                                        @Html.ActionLink("Details", "Details", new { id = item.Id }, new { @class = "btn btn-primary" })
-                                        @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })
-                                        @if (User.IsInRole("Admin") || (User.IsInRole("ProjectManager")))
+                                        @if (User.IsInRole("Submitter"))
                                         {
-                                        @Html.ActionLink("AssignTicket", "AssignTicket", new { ticketId = item.Id }, new { @class = "btn btn-success" })
+                                            @Html.ActionLink("Details", "Details", new { id = item.Id }, new { @class = "btn btn-primary" })
                                         }
+                                        else if (User.IsInRole("Admin"))
+                                        {
+                                            @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-warning" })
+                                            @Html.ActionLink("Details", "Details", new { id = item.Id }, new { @class = "btn btn-primary" })
+                                            @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })
+                                            @Html.ActionLink("AssignTicket", "AssignTicket", new { ticketId = item.Id }, new { @class = "btn btn-success" })
+                                        }
+                                        else if (User.IsInRole("ProjectManager"))
+                                        {
+                                            @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-warning" })
+                                            @Html.ActionLink("Details", "Details", new { id = item.Id }, new { @class = "btn btn-primary" })
+                                            @Html.ActionLink("AssignTicket", "AssignTicket", new { ticketId = item.Id }, new { @class = "btn btn-success" })
+                                        }
+                                        else if (User.IsInRole("Developer"))
+                                        {
+                                            @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-warning" })
+                                            @Html.ActionLink("Details", "Details", new { id = item.Id }, new { @class = "btn btn-primary" })
+                                        }
+                                        else
+                                        {
+                                            
+                                        }
+
+
                                     </td>
                                 </tr>
                             }

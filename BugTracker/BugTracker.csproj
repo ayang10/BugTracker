@@ -187,6 +187,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\NotificationsController.cs" />
     <Compile Include="Controllers\ProjectsController.cs" />
     <Compile Include="Controllers\TicketCommentsController.cs" />
     <Compile Include="Controllers\TicketsController.cs" />
@@ -210,6 +211,12 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="img\accomplishments.jpg" />
+    <Content Include="img\angularjs.png" />
+    <Content Include="img\bmw.jpg" />
+    <Content Include="img\budgetbulb.png" />
+    <Content Include="img\bugtracker.jpg" />
+    <Content Include="img\giphy.gif" />
+    <Content Include="img\hacked.jpg" />
     <Content Include="perfectum_dashboard_1_0_5\calendar.html" />
     <Content Include="perfectum_dashboard_1_0_5\chart.html" />
     <Content Include="perfectum_dashboard_1_0_5\css\bootstrap-responsive.css" />
@@ -252,6 +259,7 @@
     <Content Include="perfectum_dashboard_1_0_5\img\avatar8.jpg" />
     <Content Include="perfectum_dashboard_1_0_5\img\avatar9.jpg" />
     <Content Include="perfectum_dashboard_1_0_5\img\banner_defect-tracking-tools.jpg" />
+    <Content Include="perfectum_dashboard_1_0_5\img\bc20fb7cc1c123a28e3deb5515b33daf.230x100x38.gif" />
     <Content Include="perfectum_dashboard_1_0_5\img\bg-input-focus.png" />
     <Content Include="perfectum_dashboard_1_0_5\img\bg-input.png" />
     <Content Include="perfectum_dashboard_1_0_5\img\bg-login.jpg" />
@@ -398,6 +406,9 @@
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\_references.js" />
+    <Content Include="Views\Notifications\Create.cshtml" />
+    <Content Include="Views\Notifications\Details.cshtml" />
+    <Content Include="Views\Notifications\Edit.cshtml" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -453,6 +464,8 @@
     <Content Include="Views\TicketComments\Index.cshtml" />
     <Content Include="Views\Shared\_TicketComments.cshtml" />
     <Content Include="Views\Tickets\AssignTicket.cshtml" />
+    <Content Include="Views\Notifications\Delete.cshtml" />
+    <Content Include="Views\Notifications\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

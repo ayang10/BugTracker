@@ -158,13 +158,15 @@ namespace BugTracker.Helper
                   
                    select user;
         }
+
     }
 
     //Tickets
     public class UserTicketsHelper
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-
+       
+        
         public bool IsUserInTicket(string userId, int ticketId)
         {
             return db.Users.Find(userId).Tickets.Any(p => p.Id == ticketId);
@@ -178,12 +180,48 @@ namespace BugTracker.Helper
 
         public bool AddUserToTicket(string userId, int ticketId)
         {
+            
             var user = db.Users.Find(userId);
             var ticket = db.Tickets.Find(ticketId);
+            var changed = DateTimeOffset.Now;
+            TicketHistoryHelper thHelper = new TicketHistoryHelper();
             if (!IsUserInTicket(userId, ticketId))
             {
+
+                TicketHistory something = new TicketHistory
+                {
+                    TicketId = ticketId,
+                    Property = "AssignedTo",
+                    ChangedDate = changed,
+                    UserId = userId
+                    
+
+                };
+
+                    db.TicketHistories.Add(something);
+
+                Notification ticketAssignment = new Notification
+                {
+                    TicketId = ticket.Id,
+                    CreatorUserId = ticket.UserId,
+                    Creator = db.Users.Find(ticket.UserId),
+                    RecipientUserId = userId,
+                    Recipient = db.Users.Find(userId),
+                    Change = "Assigned Ticket",
+              
+                    DateNotified = changed
+                };
+                db.Notifications.Add(ticketAssignment);
+
+
+                //if (ticket.AssignedToUserId != null && ticketAssignment.CreatorUserId != ticket.AssignedToUserId)
+                //{
+                //    thHelper.AssignmentNotification(ticketAssignment);
+                //}
+
                 ticket.AssignTicketUsers.Add(user);
                 db.Entry(ticket).State = EntityState.Modified;
+                
                 db.SaveChanges();
                 return true;
             }
@@ -195,12 +233,42 @@ namespace BugTracker.Helper
 
         public bool RemoveUserFromTicket(string userId, int ticketId)
         {
+
             var user = db.Users.Find(userId);
             var ticket = db.Tickets.Find(ticketId);
+            var changed = DateTimeOffset.Now;
             if (IsUserInTicket(userId, ticketId))
             {
+               
+                    TicketHistory something = new TicketHistory
+                    {
+                        TicketId = ticketId,
+                        Property = "Removed",
+                        ChangedDate = changed,
+                        
+                        UserId = userId
+
+                    };
+
+                    db.TicketHistories.Add(something);
+
+                Notification ticketAssignment = new Notification
+                {
+                    TicketId = ticket.Id,
+                    CreatorUserId = ticket.UserId,
+                    Creator = db.Users.Find(ticket.UserId),
+                    RecipientUserId = userId,
+                    Recipient = db.Users.Find(userId),
+                    Change = "Removed from ticket!",
+
+                    DateNotified = changed
+                };
+                db.Notifications.Add(ticketAssignment);
+
                 ticket.AssignTicketUsers.Remove(user);
                 db.Entry(ticket).State = EntityState.Modified;
+                
+
                 db.SaveChanges();
                 return true;
             }
@@ -252,5 +320,55 @@ namespace BugTracker.Helper
                    select user;
         }
     }
- 
+
+    
+    public class TicketHistoryHelper
+    {
+        private ApplicationDbContext db = new ApplicationDbContext();
+
+        public void SendTicketNotification(Notification note)
+        {
+            Ticket ticket = db.Tickets.Find(note.TicketId);
+            ApplicationUser dest = note.Recipient;
+            EmailService es = new EmailService();
+            IdentityMessage message = new IdentityMessage
+            {
+                Destination = dest.Email,
+                Subject = "There's been a change to " + ticket.Title,
+                Body = note.Creator.DisplayName + " changed the " + note.Change + " to " + note.Details + "."
+            };
+            es.SendAsync(message);
+
+        }
+        public void AssignmentNotification(Notification note)
+        {
+            Ticket ticket = db.Tickets.Find(note.TicketId);
+            ApplicationUser dest = note.Recipient;
+            EmailService es = new EmailService();
+            IdentityMessage message = new IdentityMessage
+            {
+                Destination = dest.Email,
+                Subject = "New Ticket Assignment",
+                Body = "You've been assigned to " + ticket.Title + " in " + ticket.Project.Title + "."
+            };
+            es.SendAsync(message);
+        }
+        public void CommentNotification(Notification note)
+        {
+            Ticket ticket = db.Tickets.Find(note.TicketId);
+            ApplicationUser dest = note.Recipient;
+            EmailService es = new EmailService();
+            IdentityMessage message = new IdentityMessage
+            {
+                Destination = dest.Email,
+                Subject = "New Comment on " + ticket.Title,
+                Body = note.Creator.DisplayName + " commented: \"" + note.Details + "\" at " + note.DateNotified + "."
+            };
+            es.SendAsync(message);
+        }
+    }
+
+
+
+
 }

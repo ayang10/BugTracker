@@ -19,6 +19,8 @@ namespace BugTracker.Models
             this.TicketComments = new HashSet<TicketComment>();
             this.Projects = new HashSet<Project>();
             this.Tickets = new HashSet<Ticket>();
+            this.TicketHistories = new HashSet<TicketHistory>();
+            this.Notifications = new HashSet<Notification>();
         }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
@@ -31,6 +33,8 @@ namespace BugTracker.Models
         public virtual ICollection<TicketComment> TicketComments { get; set; }
         public virtual ICollection<Project> Projects { get; set; }
         public virtual ICollection<Ticket> Tickets { get; set; }
+        public virtual ICollection<TicketHistory> TicketHistories { get; set; }
+        public virtual ICollection<Notification> Notifications { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
@@ -47,12 +51,13 @@ namespace BugTracker.Models
 
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<Project> Projects { get; set; }
-        public DbSet<TicketChange> TicketChanges { get; set; }
+        public DbSet<TicketHistory> TicketHistories { get; set; }
         public DbSet<TicketComment> TicketComments { get; set; }
         public DbSet<TicketPriority> TicketPriorities { get; set; }
         public DbSet<TicketStatus> TicketStatuses { get; set; }
         public DbSet<TicketType> TicketTypes { get; set; }
         public DbSet<SendGridCredential> SendgridCredentials { get; set; }
-
+        public DbSet<Notification> Notifications { get; set; }
+       
     }
 }

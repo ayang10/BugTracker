@@ -20,10 +20,32 @@ namespace BugTracker.Controllers
         // GET: Tickets
         public ActionResult Index()
         {
-            var tickets = db.Tickets.Include(t => t.Project).Include(t => t.Priority).Include(t => t.Type).Include(t => t.Status).ToList();
+            var user = db.Users.Find(User.Identity.GetUserId());
+
+            if (User.IsInRole("Submitter"))
+            {
+                var tickets = db.Tickets.Where(t => t.UserId == user.UserName).Include(t => t.Project).Include(t => t.Priority).Include(t => t.Type).Include(t => t.Status).ToList();
+                return View(tickets);
+            }
+            else if (User.IsInRole("Developer"))
+            {
+                var tickets = db.Tickets.Where(t => t.UserId == user.UserName).Include(t => t.Project).Include(t => t.Priority).Include(t => t.Type).Include(t => t.Status).ToList();
+                return View(tickets);
+            }
+            
+            else if(User.IsInRole("Admin") || User.IsInRole("ProjectManager")){
+
+                var tickets = db.Tickets.Include(t => t.Project).Include(t => t.Priority).Include(t => t.Type).Include(t => t.Status).ToList();
+                return View(tickets);
+
+            }
+            else
+            {
+                return View();
+            }
+
             
             
-            return View(tickets);
         }
 
         // GET: Tickets/Details/5
@@ -58,25 +80,28 @@ namespace BugTracker.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,UserId,ProjectId,PriorityId,TypeId,StatusId,Description,Title,CreationDate,MediaUrl")] Ticket ticket, HttpPostedFileBase fileUpload)
+        public ActionResult Create([Bind(Include = "Id,UserId,ProjectId,PriorityId,TypeId,StatusId,Description,Title,CreationDate,Attachment")] Ticket ticket, HttpPostedFileBase fileUpload)
         {
             ticket.CreationDate = new DateTimeOffset(DateTime.Now);
 
             if (ModelState.IsValid)
             {
+                
+
                 // restricting the valid file formats to images only
                 if (Ticket.ImageUploadValidator.IsWebFriendlyImage(fileUpload))
                 {
                     var fileName = Path.GetFileName(fileUpload.FileName);
                     fileUpload.SaveAs(Path.Combine(Server.MapPath("~/img/"), fileName));
-                    ticket.MediaUrl = "~/img/" + fileName;
+                    ticket.Attachment = "~/img/" + fileName;
 
                 }
 
                 var user = db.Users.Find(User.Identity.GetUserId());
 
                 ticket.UserId = user.UserName;
-              
+
+                ticket.StatusId = 1;
 
                 ticket.CreationDate = new DateTimeOffset(DateTime.Now);
 
@@ -84,6 +109,7 @@ namespace BugTracker.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
+            
 
             ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Title", ticket.ProjectId);
             ViewBag.PriorityId = new SelectList(db.TicketPriorities, "Id", "Name", ticket.PriorityId);
@@ -101,7 +127,8 @@ namespace BugTracker.Controllers
 
             AssignTicketUser assignticketuser = new AssignTicketUser();
             UserTicketsHelper helper = new UserTicketsHelper();
-
+            var userId = User.Identity.GetUserId();
+            var changed = DateTimeOffset.Now;
             var select = helper.UsersInTicket(ticketId).Select(i => i.Id);
 
             var projectManagerUser = helper.GetApplicationUsersInRole("ProjectManager");
@@ -115,11 +142,14 @@ namespace BugTracker.Controllers
 
                 assignticketuser.DeveloperManagerUsers = new MultiSelectList(developerUsers, "Id", "DisplayName", select);
 
+
             }
             else if (User.IsInRole("ProjectManager"))
             {
                 assignticketuser.DeveloperManagerUsers = new MultiSelectList(developerUsers, "Id", "DisplayName", select);
             }
+
+           
 
             assignticketuser.Ticket = db.Tickets.Find(ticketId);
 
@@ -132,9 +162,16 @@ namespace BugTracker.Controllers
         public ActionResult AssignTicket(int ticketId, AssignTicketUser assignuser)
         {
             UserTicketsHelper helper = new UserTicketsHelper();
-
+            Ticket ticket = new Ticket();
+            var userId = User.Identity.GetUserId();
+            TicketHistoryHelper thHelper = new TicketHistoryHelper();
+            var changed = DateTimeOffset.Now;
+            var select = helper.UsersInTicket(ticketId).Select(i => i.Id);
+            
             if (ModelState.IsValid)
             {
+                
+
                 string[] empty = { };
                 assignuser.SelectedUser = assignuser.SelectedUser ?? empty;
 
@@ -143,16 +180,25 @@ namespace BugTracker.Controllers
                     if (assignuser.SelectedUser.Contains(user.Id))
                     {
                         helper.AddUserToTicket(user.Id, ticketId);
-
+                        
+                      
                     }
+
                     else
                     {
                         helper.RemoveUserFromTicket(user.Id, ticketId);
-
+                        
                     }
                 }
+           
+
+
+
                 db.SaveChanges();
             }
+
+
+
 
             return RedirectToAction("Index", "Tickets");
         }
@@ -174,6 +220,7 @@ namespace BugTracker.Controllers
             ViewBag.PriorityId = new SelectList(db.TicketPriorities, "Id", "Name", ticket.PriorityId);
             ViewBag.TypeId = new SelectList(db.TicketTypes, "Id", "Name", ticket.TypeId);
             ViewBag.StatusId = new SelectList(db.TicketStatuses, "Id", "Name", ticket.StatusId);
+
             return View(ticket);
         }
 
@@ -182,29 +229,242 @@ namespace BugTracker.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,UserId,ProjectId,PriorityId,TypeId,StatusId,Description,Title,CreationDate,MediaUrl")] Ticket ticket, HttpPostedFileBase fileUpload)
+        public ActionResult Edit([Bind(Include = "Id,UserId,ProjectId,PriorityId,TypeId,StatusId,Description,Title,CreationDate,Attachment")] Ticket ticket, HttpPostedFileBase fileUpload)
         {
+            
+
             if (ModelState.IsValid)
             {
+                TicketHistoryHelper thHelper = new TicketHistoryHelper();
+                UserTicketsHelper helper = new UserTicketsHelper();
+                var user = db.Users.Find(User.Identity.GetUserId());
+                var OldTicket = db.Tickets.AsNoTracking().FirstOrDefault(t => t.Id == ticket.Id);
+               
+                var changedDate = DateTimeOffset.Now;
+        
+
+                ticket.AssignTicketUsers = helper.UsersInTicket(ticket.Id);
+                Notification notification = new Notification();
+                
+
+                if (OldTicket.Title != ticket.Title)
+                {
+                    TicketHistory ticketHistorys = new TicketHistory
+                    {
+                        TicketId = ticket.Id,
+                        Property = "Title",
+                        Old = OldTicket.Title,
+                        OldValue = OldTicket.Title,
+                        New = ticket.Title,
+                        NewValue = ticket.Title,
+                        ChangedDate = changedDate,
+                        UserId = user.Id
+                    };
+                    db.TicketHistories.Add(ticketHistorys);
+
+
+                    foreach (var item in ticket.AssignTicketUsers.ToList())
+                    {
+                        notification.TicketId = ticket.Id;
+                        notification.CreatorUserId = user.UserName;
+                        notification.Creator = user;
+                        notification.RecipientUserId = item.Id;
+                        notification.Recipient = db.Users.Find(item.UserName);
+                        notification.Change = "Changed Title";
+                        notification.DateNotified = changedDate;
+
+
+                        db.Notifications.Add(notification);
+                        db.SaveChanges();
+                    }
+
+                }
+
+                if(OldTicket.Description != ticket.Description)
+                {
+                    TicketHistory ticketHistorys = new TicketHistory
+                    {
+                        TicketId = ticket.Id,
+                        Property = "Description",
+                        Old = OldTicket.Description,
+                        OldValue = OldTicket.Description,
+                        New = ticket.Description,
+                        NewValue = ticket.Description,
+                        ChangedDate = changedDate,
+                        UserId = user.Id
+                    };
+                    db.TicketHistories.Add(ticketHistorys);
+
+
+                    foreach (var item in ticket.AssignTicketUsers.ToList())
+                    {
+                        notification.TicketId = ticket.Id;
+                        notification.CreatorUserId = user.Id;
+                        notification.Creator = user;
+                        notification.RecipientUserId = item.Id;
+                        notification.Recipient = db.Users.Find(item.UserName);
+                        notification.Change = "Edit Description";
+                        notification.DateNotified = changedDate;
+
+
+                        db.Notifications.Add(notification);
+                        db.SaveChanges();
+                    }
+                    
+                }
+
+                if (OldTicket.PriorityId != ticket.PriorityId)
+                {
+                    TicketHistory ticketHistorys = new TicketHistory
+                    {
+                        TicketId = ticket.Id,
+                        Property = "Priority",
+                        Old = OldTicket.Priority.Name,
+                        OldValue = OldTicket.Priority.Name,
+                        New = ticket.Priority.Name,
+                        NewValue = ticket.Priority.Name,
+                        ChangedDate = changedDate,
+                        UserId = user.Id
+                    };
+                    db.TicketHistories.Add(ticketHistorys);
+
+
+                    foreach (var item in ticket.AssignTicketUsers.ToList())
+                    {
+                        notification.TicketId = ticket.Id;
+                        notification.CreatorUserId = user.Id;
+                        notification.Creator = user;
+                        notification.RecipientUserId = item.Id;
+                        notification.Recipient = db.Users.Find(item.UserName);
+                        notification.Change = "Changed Priority";
+                        notification.DateNotified = changedDate;
+
+
+                        db.Notifications.Add(notification);
+                        db.SaveChanges();
+                    }
+
+                }
+
+                if (OldTicket.StatusId != ticket.StatusId)
+                {
+                    TicketHistory ticketHistorys = new TicketHistory
+                    {
+                        TicketId = ticket.Id,
+                        Property = "Status",
+                        Old = OldTicket.Status.Name,
+                        OldValue = OldTicket.Status.Name,
+                        New = ticket.Status.Name,
+                        NewValue = ticket.Status.Name,
+                        ChangedDate = changedDate,
+                        UserId = user.Id
+                    };
+                    db.TicketHistories.Add(ticketHistorys);
+
+
+                    foreach (var item in ticket.AssignTicketUsers.ToList())
+                    {
+                        notification.TicketId = ticket.Id;
+                        notification.CreatorUserId = user.Id;
+                        notification.Creator = user;
+                        notification.RecipientUserId = item.Id;
+                        notification.Recipient = db.Users.Find(item.UserName);
+                        notification.Change = "Changed Status";
+                        notification.DateNotified = changedDate;
+
+
+                        db.Notifications.Add(notification);
+                        db.SaveChanges();
+                    }
+
+                }
+
+                if (OldTicket.TypeId != ticket.TypeId)
+                {
+                    TicketHistory ticketHistorys = new TicketHistory
+                    {
+                        TicketId = ticket.Id,
+                        Property = "Status",
+                        Old = OldTicket.Type.Name,
+                        OldValue = OldTicket.Type.Name,
+                        New = ticket.Type.Name,
+                        NewValue = ticket.Type.Name,
+                        ChangedDate = changedDate,
+                        UserId = user.Id
+                    };
+                    db.TicketHistories.Add(ticketHistorys);
+
+
+                    foreach (var item in ticket.AssignTicketUsers.ToList())
+                    {
+                        notification.TicketId = ticket.Id;
+                        notification.CreatorUserId = user.Id;
+                        notification.Creator = user;
+                        notification.RecipientUserId = item.Id;
+                        notification.Recipient = db.Users.Find(item.UserName);
+                        notification.Change = "Changed Type";
+                        notification.DateNotified = changedDate;
+
+
+                        db.Notifications.Add(notification);
+                        db.SaveChanges();
+                    }
+
+                }
+
+                if (OldTicket.Attachment != ticket.Attachment)
+                {
+                    TicketHistory ticketHistorys = new TicketHistory
+                    {
+                        TicketId = ticket.Id,
+                        Property = "Status",
+                        Old = OldTicket.Attachment,
+                        OldValue = OldTicket.Attachment,
+                        New = ticket.Attachment,
+                        NewValue = ticket.Attachment,
+                        ChangedDate = changedDate,
+                        UserId = user.Id
+                    };
+                    db.TicketHistories.Add(ticketHistorys);
+
+
+                    foreach (var item in ticket.AssignTicketUsers.ToList())
+                    {
+                        notification.TicketId = ticket.Id;
+                        notification.CreatorUserId = user.Id;
+                        notification.Creator = user;
+                        notification.RecipientUserId = item.Id;
+                        notification.Recipient = db.Users.Find(item.UserName);
+                        notification.Change = "Changed Attachment";
+                        notification.DateNotified = changedDate;
+
+
+                        db.Notifications.Add(notification);
+                        db.SaveChanges();
+                    }
+
+                }
+
                 var fetched = db.Tickets.Find(ticket.Id);
                 fetched.UserId = ticket.UserId;
-                fetched.Priority = ticket.Priority;
-                fetched.Type = ticket.Type;
-                fetched.Status = ticket.Status;
-                fetched.MediaUrl = ticket.MediaUrl;
+                fetched.PriorityId = ticket.PriorityId;
+                fetched.TypeId = ticket.TypeId;
+                fetched.StatusId = ticket.StatusId;
+                fetched.Attachment = ticket.Attachment;
                 fetched.Title = ticket.Title;
                 fetched.Description = ticket.Description;
 
+                
                 // restricting the valid file formats to images only
                 if (Ticket.ImageUploadValidator.IsWebFriendlyImage(fileUpload))
                 {
                     var fileName = Path.GetFileName(fileUpload.FileName);
                     fileUpload.SaveAs(Path.Combine(Server.MapPath("~/img/"), fileName));
-                    fetched.MediaUrl = "~/img/" + fileName;
+                    fetched.Attachment = "~/img/" + fileName;
 
                 }
 
-
+                
 
                 db.Entry(fetched).State = EntityState.Modified;
                 db.SaveChanges();

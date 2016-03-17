@@ -85,14 +85,19 @@ namespace BugTracker.Controllers
             
             AssignProjectUser assignprojectuser = new AssignProjectUser();
             UserProjectsHelper helper = new UserProjectsHelper();
-           
+
+            var users = helper.GetApplicationUsersInRole("ProjectManager");
+            var developerUsers = helper.GetApplicationUsersInRole("Developer");
+
             var select = helper.UsersInProject(projectId).Select(i => i.Id);
             if (User.IsInRole("Admin"))
             {
-                var users = helper.GetApplicationUsersInRole("ProjectManager");
-
+                
                 assignprojectuser.Users = new MultiSelectList(users, "Id", "DisplayName", select);
+                assignprojectuser.DeveloperUsers = new MultiSelectList(developerUsers, "Id", "DisplayName", select);
+
        }
+            
             assignprojectuser.Project = db.Projects.Find(projectId);
 
             return View(assignprojectuser);
@@ -123,6 +128,7 @@ namespace BugTracker.Controllers
                       
                     }
                 }
+                
                 db.SaveChanges();
             }
 

@@ -31,15 +31,16 @@
 </head>
 <body>
 
+
     <!-- start: Header -->
     <div class="navbar">
         <div class="navbar-inner">
             <div class="container-fluid">
-                @*<a class="btn btn-navbar" data-toggle="collapse" data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </a>*@
+                <a class="btn btn-navbar" data-toggle="collapse" data-target=".top-nav.nav-collapse,.sidebar-nav.nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </a>
                 <a class="brand" href="@Url.Action("Index", "Home")"> <img alt="Perfectum Dashboard" src="~/perfectum_dashboard_1_0_5/img/bug.png" width="40" /> <span class="hidden-phone">BuggyTracker</span></a>
 
                 <div class="pull-right">@Html.Partial("_LoginPartial")</div>
@@ -56,10 +57,16 @@
             <!-- start: Main Menu -->
             <div class="span2 main-menu-span">
                 <div class="nav-collapse sidebar-nav">
-                  
-                </div><!--/.well -->
-            </div><!--/span-->
-            <!-- end: Main Menu -->
+                    <ul class="nav nav-tabs nav-stacked ">
+                        @if (User.Identity.IsAuthenticated == true)
+                        {
+                            <li>
+                                <a href="@Url.Action("Dashboard", "Home")"><i class="icon-home icon-white"></i><span class="hidden-tablet"> Dashboard</span></a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
 
 
             <div id="content" class="span10">
@@ -70,33 +77,33 @@
 
 
                 <img src="~/perfectum_dashboard_1_0_5/img/banner_defect-tracking-tools.jpg" width="1250" />
-
-                <hr />
-                <h1>Register with us to experience what we have to offer.</h1>
                 @if (User.Identity.IsAuthenticated == false)
                 {
+                    <hr />
+                                <h1>Register with us to experience what we have to offer.</h1>
 
 
-                    <div class="buttons">
-                        @Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink", @class = "btn btn-skin btn-lg btn-primary" })
 
-                    </div>
+                                <div class="buttons">
+                                    @Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink", @class = "btn btn-skin btn-lg btn-primary" })
+
+                                </div>
                 }
 
                 <hr />
-
-                <h1>Guest Login to tour our atmosphere</h1>
                 @if (User.Identity.IsAuthenticated == false)
                 {
+                    <h1>Guest Login to tour our atmosphere</h1>
 
 
-                    <div class="buttons">
-                        <button class="btn btn-primary" ><i class="icon-bell icon-white"></i>Admin</button>
-                        <button class="btn btn-success" ><i class="icon-camera icon-white"></i>Project Manager</button>
-                        <button class="btn btn-danger" ><i class="icon-film icon-white"></i>Developer</button>
-                        <button class="btn btn-warning" ><i class="icon-book icon-white"></i>Submitter</button>
 
-                    </div>
+                                <div class="buttons">
+                                    <button class="btn btn-primary"><i class="icon-bell icon-white"></i>Admin</button>
+                                    <button class="btn btn-success"><i class="icon-camera icon-white"></i>Project Manager</button>
+                                    <button class="btn btn-danger"><i class="icon-film icon-white"></i>Developer</button>
+                                    <button class="btn btn-warning"><i class="icon-book icon-white"></i>Submitter</button>
+
+                                </div>
                 }
 
             </div><!--/fluid-row-->

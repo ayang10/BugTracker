@@ -37,6 +37,32 @@
 
             </div>
         </div>
+
+        <br />
+        <p>
+            <b>Selected Developer Users:</b>
+
+            @foreach (var item in Model.DeveloperUsers)
+                {
+                    if (item.Selected)
+                    {
+                    <br />
+                        <b class="red">@Html.DisplayFor(m => item.Text)</b>
+
+                }
+            }
+
+        </p>
+        <hr />
+        <div class="form-group">
+            <div class="col-md-12">
+                @Html.ListBoxFor(r => r.SelectedUser, Model.DeveloperUsers, new { style = "width: 50%", size = 10 })
+
+            </div>
+        </div>
+
+        <br />
+
         <br />
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">

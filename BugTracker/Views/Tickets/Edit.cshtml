@@ -80,21 +80,21 @@
         </div>
         <br />
         <div class="form-group">
-            <b>MediaUrl</b>
+            <b>Attachment</b>
             <div class="col-md-10">
-                @Html.HiddenFor(model => model.MediaUrl)
+                @Html.HiddenFor(model => model.Attachment)
                 <h6>Current file: 
-                @if (Model.MediaUrl == null)
+                @if (Model.Attachment == null)
                 {
                 <strong>No image</strong>
                 }
                 else
                 {
-                @Html.DisplayFor(model => model.MediaUrl) 
+                @Html.DisplayFor(model => model.Attachment) 
                 }
                 </h6>
                 <input name="fileUpload" type="file" id="fileUpload" />
-                @Html.ValidationMessageFor(model => model.MediaUrl, "", new { @class = "text-danger" })
+                @Html.ValidationMessageFor(model => model.Attachment, "", new { @class = "text-danger" })
             </div>
         </div>
         <br />

@@ -4,241 +4,367 @@
     ViewBag.Title = "BuggyTracker - Dashboard";
 }
 
-
-<br />
-
 @if (User.IsInRole("Admin") || User.IsInRole("ProjectManager"))
 {
+    <br />
     <div class="container">
-        <div class="page-content">
+        <div class="row">
 
-            <!-- Heading -->
-            <div class="single-head">
-                <!-- Heading -->
-                <h1 class="pull-left">
-                    <i class="fa fa-table purple"></i> Projects
-                </h1>
-                @if (User.IsInRole("Admin"))
-                {
-                    <div class="pull-right">@Html.ActionLink("Create new project", "Create", null, new { @class = "btn btn-primary" })</div>
-                }
-                <div class="clearfix"></div>
+            <a class="quick-button span4 " href="@Url.Action("Index", "Projects")">
+                <i class="fa-icon-file"></i>
+                <p>Projects</p>
+                <span class="notification">
+                    @Model.Projects.Count
+                </span>
+            </a>
+
+
+            <a class="quick-button span4 " href="@Url.Action("Index", "Tickets")">
+                <i class="fa-icon-th-list"></i>
+                <p>Tickets</p>
+                <span class="notification">
+                    @Model.Tickets.Count
+                </span>
+            </a>
+
+            <a class="quick-button span4" href="@Url.Action("Index", "Notifications")">
+                <i class="fa-icon-lemon"></i>
+                <p>Notifications</p>
+                <span class="notification">
+                    @Model.Notifications.Count
+                </span>
+            </a>
+
+        </div>
+    </div>
+}
+@if (User.IsInRole("Developer"))
+{
+    <br />
+    <div class="container">
+        <div class="row">
+            <a class="quick-button span6 " href="@Url.Action("Index", "Tickets")">
+                <i class="fa-icon-th-list"></i>
+                <p>Tickets</p>
+                <span class="notification">
+                    @Model.Tickets.Count
+                </span>
+            </a>
+
+            <a class="quick-button span6" href="@Url.Action("Index", "Notifications")">
+                <i class="fa-icon-lemon"></i>
+                <p>Notifications</p>
+                <span class="notification">
+                    @Model.Notifications.Count
+                </span>
+            </a>
+
+        </div>
+    </div>
+}
+@if (User.IsInRole("Submitter"))
+{
+    <br />
+    <div class="container">
+        <div class="row">
+            <a class="quick-button span12"  href="@Url.Action("Index", "Notifications")">
+                <i class="fa-icon-lemon"></i>
+                <p>Notifications</p>
+                <span class="notification">
+                    @Model.Notifications.Count
+                </span>
+            </a>
+
             </div>
+</div>
+            }
+            <br />
 
-            <!-- Table Page -->
-            <div class="page-tables">
-                <!-- Table -->
-                <div class="table-responsive">
-                    <table cellpadding="0" cellspacing="0" border="0" id="data-table" width="100%" class="table">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Description</th>
-                                <th>Creation Date</th>
-                                <th>Created By</th>
+            @if (User.IsInRole("Admin") || User.IsInRole("ProjectManager") || User.IsInRole("Developer"))
+            {
+                <div class="container">
+                    <div class="page-content">
 
-                                <th>Control</th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                            @foreach (var item in Model.Projects)
+                        <!-- Heading -->
+                        <div class="single-head">
+                            <!-- Heading -->
+                            @if (User.IsInRole("Admin"))
                             {
+                                <h1 class="pull-left">
+                                    <i class="fa fa-icon-leaf green"></i>
+                                    Projects
+                                    <hr />
+                                </h1>
 
-                                <tr>
-                                    <td>
-                                        @item.Title
-                                    </td>
-                                    <td>
-                                        @Html.Raw(item.Description)
-                                    </td>
-                                    <td>
-                                        @item.CreationDate.ToString("D")
-                                    </td>
-                                    <td>
-                                        @item.UserId
-                                    </td>
+                            }
+                            @if (User.IsInRole("ProjectManager") || User.IsInRole("Developer"))
+                            {
+                                <h1 class="pull-left">
+                                    <i class="fa fa-icon-leaf green"></i>
+                                    Assigned Projects
+                                    <hr />
+                                </h1>
+                            }
 
-                                    <td>
-                                        @if (User.IsInRole("Admin"))
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div class="pull-right">@Html.ActionLink("Create new project", "Create", "Projects", null, new { @class = "btn btn-primary" })</div>
+                            }
+                            <div class="clearfix"></div>
+                        </div>
+
+                        <!-- Table Page -->
+                        <div class="page-tables">
+                            <!-- Table -->
+                            <div class="table-responsive">
+                                <table cellpadding="0" cellspacing="0" border="0" id="data-table" width="100%" class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Description</th>
+                                            <th>Creation Date</th>
+                                            <th>Created By</th>
+
+                                            <th>Control</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @foreach (var item in Model.Projects)
                                         {
-                                            @Html.ActionLink("Edit", "Edit", "Projects", new { id = item.Id }, new { @class = "btn btn-info" })
-                                            @*@Html.ActionLink("Details", "Details", new { id = item.Id }) |*@
-                                            @Html.ActionLink("Delete", "Delete", "Projects", new { id = item.Id }, new { @class = "btn btn-danger" })
-                                            @Html.ActionLink("AssignUserToProject", "AssignUserView", "Projects", new { projectId = item.Id }, new { @class = "btn btn-primary" })
+
+                                            <tr>
+                                                <td>
+                                                    @item.Title
+                                                </td>
+                                                <td>
+                                                    @Html.Raw(item.Description)
+                                                </td>
+                                                <td>
+                                                    @item.CreationDate.ToString("D")
+                                                </td>
+                                                <td>
+                                                    @item.UserId
+                                                </td>
+
+                                                <td>
+                                                    @if (User.IsInRole("Admin"))
+                                                    {
+                                                        @Html.ActionLink("Edit", "Edit", "Projects", new { id = item.Id }, new { @class = "btn btn-info" })
+                                                        @*@Html.ActionLink("Details", "Details", new { id = item.Id }) |*@
+                                                        @Html.ActionLink("Delete", "Delete", "Projects", new { id = item.Id }, new { @class = "btn btn-danger" })
+                                                        @Html.ActionLink("AssignUserToProject", "AssignUserView", "Projects", new { projectId = item.Id }, new { @class = "btn btn-success" })
+                                                    }
+
+
+                                                </td>
+                                            </tr>
                                         }
 
 
-                                    </td>
-                                </tr>
-                            }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Description</th>
+                                            <th>Creation Date</th>
+                                            <th>Created By</th>
 
+                                            <th>Control</th>
 
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th>Title</th>
-                                <th>Description</th>
-                                <th>Creation Date</th>
-                                <th>Created By</th>
-
-                                <th>Control</th>
-
-                            </tr>
-                        </tfoot>
-                    </table>
-                    <div class="clearfix"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-
-<br />
-@if ((User.IsInRole("Admin")) || (User.IsInRole("ProjectManager")) || (User.IsInRole("Developer")) || (User.IsInRole("Submitter")))
-{
-    <div class="main-content">
-        <div class="container">
-
-            <div class="page-content">
-
-                <!-- Heading -->
-                <div class="single-head">
-                    <!-- Heading -->
-                    <h1 class="pull-left">
-                        <i class="fa fa-table purple"></i> Tickets
-                    </h1>
-
-                    <div class="pull-right">@Html.ActionLink("Create new Tickets", "Create", null, new { @class = "btn btn-primary" })</div>
-                    <div class="clearfix"></div>
-                </div>
-
-                <!-- Table Page -->
-                <div class="page-tables">
-                    <!-- Table -->
-                    <div class="table-responsive">
-                        <table cellpadding="0" cellspacing="0" border="0" id="data-table1" width="100%" class="table">
-                            <thead>
-                                <tr>
-                                    <th>Project</th>
-                                    <th>Created By</th>
-                                    <th>Priority</th>
-                                    <th>Type</th>
-                                    <th>Status</th>
-                                    <th>Title</th>
-                                    <th>Description</th>
-                                    <th>Creation Date</th>
-                                    <th>MediaUrl</th>
-                                    <th>Control</th>
-
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                                @foreach (var item in Model.Tickets)
-                                {
-                                    <tr>
-                                        <td>
-                                            @item.Project.Title
-                                        </td>
-                                        <td>
-                                            @item.UserId
-                                        </td>
-                                        <td>
-
-                                            @Html.DisplayFor(modelItem => item.Priority.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Type.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Status.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Title)
-                                        </td>
-                                        <td>
-                                            @Html.Raw(item.Description)
-                                        </td>
-                                        <td>
-                                            @item.CreationDate.ToString("D")
-                                        </td>
-
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.MediaUrl)
-                                        </td>
-                                        <td>
-                                            @Html.ActionLink("Edit", "Edit", "Tickets", new { id = item.Id }, new { @class = "btn btn-warning" })
-                                            @Html.ActionLink("Details", "Details", "Tickets", new { id = item.Id }, new { @class = "btn btn-success" })
-                                            @Html.ActionLink("Delete", "Delete", "Tickets", new { id = item.Id }, new { @class = "btn btn-danger" })
-
-                                        </td>
-                                    </tr>
-                                }
-
-
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th>Project</th>
-                                    <th>Created By</th>
-                                    <th>Priority</th>
-                                    <th>Type</th>
-                                    <th>Status</th>
-                                    <th>Title</th>
-                                    <th>Description</th>
-                                    <th>Creation Date</th>
-                                    <th>MediaUrl</th>
-                                    <th>Control</th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                        <div class="clearfix"></div>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            }
 
-    </div>
+            <br />
+            <br />
+            @if ((User.IsInRole("Admin")) || (User.IsInRole("ProjectManager")) || (User.IsInRole("Developer")) || (User.IsInRole("Submitter")))
+            {
+                <div class="main-content">
+                    <div class="container">
+
+                        <div class="page-content">
+
+                            <!-- Heading -->
+                            <div class="single-head">
+                                <!-- Heading -->
+                                @if (User.IsInRole("Admin") || User.IsInRole("ProjectManager") || User.IsInRole("Submitter"))
+                    {
+                                    <h1 class="pull-left">
+                                        <i class="fa fa-icon-leaf blue"></i> Tickets
+                                        <hr />
+                                    </h1>
+                                }
+                                else if (User.IsInRole("Developer"))
+                                {
+                                    <h1 class="pull-left">
+                                        <i class="fa fa-icon-leaf blue"></i> Assigned Tickets
+                                        <hr />
+                                    </h1>
+                                }
+                                <div class="pull-right">@Html.ActionLink("Create new Tickets", "Create", "Tickets", null, new { @class = "btn btn-success" })</div>
+                                <div class="clearfix"></div>
+                            </div>
+
+                            <!-- Table Page -->
+                            <div class="page-tables">
+                                <!-- Table -->
+                                <div class="table-responsive">
+                                    <table cellpadding="0" cellspacing="0" border="0" id="data-table1" width="100%" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Project</th>
+                                                <th>Created By</th>
+                                                <th>Priority</th>
+                                                <th>Type</th>
+                                                <th>Status</th>
+                                                <th>Title</th>
+                                                <th>Description</th>
+                                                <th>Creation Date</th>
+                                                <th>Attachment</th>
+                                                <th>Control</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            @foreach (var item in Model.Tickets)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @item.Project.Title
+                                                    </td>
+                                                    <td>
+                                                        @item.UserId
+                                                    </td>
+
+                                                    <td>
+
+                                                        @Html.DisplayFor(modelItem => item.Priority.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Type.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Status.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Title)
+                                                    </td>
+                                                    <td>
+                                                        @Html.Raw(item.Description)
+                                                    </td>
+                                                    <td>
+                                                        @item.CreationDate.ToString("D")
+                                                    </td>
+
+                                                    <td>
+                                                        @if (item.Attachment != null)
+                                                        {
+                                                            <img src="@Url.Content(item.Attachment)" class="thumbnail" alt="" width="100" height="100" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <img src="~/perfectum_dashboard_1_0_5/img/No_Image_Available.png" class="thumbnail" alt="" width="100" height="100" />
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (User.IsInRole("Admin") || (User.IsInRole("ProjectManager")))
+                                                        {
+
+                                                            @Html.ActionLink("Edit", "Edit", "Tickets", new { id = item.Id }, new { @class = "btn btn-warning" })
+                                                            @Html.ActionLink("Details", "Details", "Tickets", new { id = item.Id }, new { @class = "btn btn-primary" })
+                                                            @Html.ActionLink("Delete", "Delete", "Tickets", new { id = item.Id }, new { @class = "btn btn-danger" })
+                                                            @Html.ActionLink("AssignTicket", "AssignTicket", "Tickets", new { ticketId = item.Id }, new { @class = "btn btn-success" })
+                                                        }
+                                                        else if (User.IsInRole("Developer"))
+                                                        {
+                                                            @Html.ActionLink("Edit", "Edit", "Tickets", new { id = item.Id }, new { @class = "btn btn-warning" })
+                                                            @Html.ActionLink("Details", "Details", "Tickets", new { id = item.Id }, new { @class = "btn btn-primary" })
+                                                        }
+                                                        else if (User.IsInRole("Submitter"))
+                                                        {
+                                                            @Html.ActionLink("Details", "Details", "Tickets", new { id = item.Id }, new { @class = "btn btn-primary" })
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
 
 
-}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Project</th>
+                                                <th>Created By</th>
+                                                <th>Priority</th>
+                                                <th>Type</th>
+                                                <th>Status</th>
+                                                <th>Title</th>
+                                                <th>Description</th>
+                                                <th>Creation Date</th>
+                                                <th>Attachment</th>
+                                                <th>Control</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            }
+
+            <br />
+            @if (!(User.IsInRole("Admin") || (User.IsInRole("ProjectManager")) || (User.IsInRole("Developer")) || (User.IsInRole("Submitter"))))
+            {
+                <h1 class="red">Please wait for Administrator to assign you a role before furthur navigating.... </h1>
+                <p>
+                    <img src="~/perfectum_dashboard_1_0_5/img/bc20fb7cc1c123a28e3deb5515b33daf.230x100x38.gif" />
+                </p>
+
+            }
 
 
 
+            @section Scripts{
+
+                <script type="text/javascript">
+                    /* ****************************************** */
+                    /* Data Table JS */
+                    /* ****************************************** */
+
+                    $(document).ready(function () {
+                        $('#data-table').dataTable({
+                            "sPaginationType": "full_numbers"
+                        });
+                    });
+
+                </script>
 
 
+                <script type="text/javascript">
+                    /* ****************************************** */
+                    /* Data Table JS */
+                    /* ****************************************** */
 
-@section Scripts{
+                    $(document).ready(function () {
+                        $('#data-table1').dataTable({
+                            "sPaginationType": "full_numbers"
+                        });
+                    });
 
-    <script type="text/javascript">
-        /* ****************************************** */
-        /* Data Table JS */
-        /* ****************************************** */
-
-        $(document).ready(function () {
-            $('#data-table').dataTable({
-                "sPaginationType": "full_numbers"
-            });
-        });
-
-    </script>
+                </script>
 
 
-    <script type="text/javascript">
-        /* ****************************************** */
-        /* Data Table JS */
-        /* ****************************************** */
-
-        $(document).ready(function () {
-            $('#data-table1').dataTable({
-                "sPaginationType": "full_numbers"
-            });
-        });
-
-    </script>
-
-
-}
+            }

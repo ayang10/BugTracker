@@ -17,8 +17,13 @@ namespace BugTracker.Controllers
         // GET: TicketComments
         public ActionResult Index()
         {
-            var ticketComments = db.TicketComments.Include(t => t.Ticket).Include(t => t.User);
-            return View(ticketComments.ToList());
+            if (User.IsInRole("Admin") || User.IsInRole("ProjectManager") || User.IsInRole("Developer") || User.IsInRole("Submitter"))
+            {
+                var ticketComments = db.TicketComments.Include(t => t.Ticket).Include(t => t.User);
+                return View(ticketComments.ToList());
+            }
+
+            return RedirectToAction("Error", "Shared");
         }
 
         // GET: TicketComments/Details/5

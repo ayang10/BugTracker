@@ -128,38 +128,38 @@ namespace BugTracker.Migrations
             var uStore = new UserStore<ApplicationUser>(context);
             var userManager = new UserManager<ApplicationUser>(uStore);
 
-            if (userManager.FindByEmail("buggytracker1@gmail.com") == null)
+            if (userManager.FindByEmail("admin@buggytracker.net") == null)
             {
                 userManager.Create(new ApplicationUser
                 {
-                    UserName = "buggytracker1@gmail.com",
-                    Email = "buggytracker1@gmail.com",
-                    FirstName = "A",
-                    LastName = "Yang",
-                    DisplayName = "A Yang"
+                    UserName = "admin@buggytracker.net",
+                    Email = "admin@buggytracker.net",
+                    FirstName = "Steph",
+                    LastName = "Green",
+                    DisplayName = "Steph Green"
                 }, "Password-1");
             }
             //assign me to the Admin role, if not already in it
-            var userId = userManager.FindByEmail("buggytracker1@gmail.com").Id;
+            var userId = userManager.FindByEmail("admin@buggytracker.net").Id;
             if (!userManager.IsInRole(userId, "Admin"))
             {
                 userManager.AddToRole(userId, "Admin");
             }
 
-            // add bobby to the database
-            if (userManager.FindByEmail("bdavis@coderfoundry") == null)
+            // add Mikey to the database
+            if (userManager.FindByEmail("projectmanager@buggytracker.net") == null)
             {
                 userManager.Create(new ApplicationUser
                 {
-                    UserName = "bdavis@coderfoundry",
-                    Email = "bdavis@coderfoundry.com",
-                    FirstName = "Bobby",
-                    LastName = "Davis",
-                    DisplayName = "Bobby Davis"
+                    UserName = "projectmanager@buggytracker.net",
+                    Email = "projectmanager@buggytracker.net",
+                    FirstName = "Mikey",
+                    LastName = "Fan",
+                    DisplayName = "Mikey Fan"
                 }, "Password-1");
             }
-            //assign me to the Admin role, if not already in it
-            userId = userManager.FindByEmail("bdavis@coderfoundry.com").Id;
+            //assign me to the Projectmanager role, if not already in it
+            userId = userManager.FindByEmail("projectmanager@buggytracker.net").Id;
             if (!userManager.IsInRole(userId, "ProjectManager"))
             {
                 userManager.AddToRole(userId, "ProjectManager");
@@ -167,68 +167,48 @@ namespace BugTracker.Migrations
 
 
             // add Andrew to the database
-            if (userManager.FindByEmail("ajensen@coderfoundry.com") == null)
+            if (userManager.FindByEmail("developer@buggytracker.net") == null)
             {
                 userManager.Create(new ApplicationUser
                 {
-                    UserName = "ajensen@coderfoundry.com",
-                    Email = "ajensen@coderfoundry.com",
-                    FirstName = "Andrew",
-                    LastName = "Jensen",
-                    DisplayName = "Andrew Jensen"
+                    UserName = "developer@buggytracker.net",
+                    Email = "developer@buggytracker.net",
+                    FirstName = "Nick",
+                    LastName = "Jones",
+                    DisplayName = "Nick Jones"
                 }, "Password-1");
             }
 
             // assign Andrew to the ProjectManager role, if not already in it
-            userId = userManager.FindByEmail("ajensen@coderfoundry.com").Id;
-            if (!userManager.IsInRole(userId, "ProjectManager"))
+            userId = userManager.FindByEmail("developer@buggytracker.net").Id;
+            if (!userManager.IsInRole(userId, "Developer"))
             {
-                userManager.AddToRole(userId, "ProjectManager");
+                userManager.AddToRole(userId, "Developer");
             }
 
 
             // add Rai to the database
-            if (userManager.FindByEmail("ramanglani@coderfoundry.com") == null)
+            if (userManager.FindByEmail("submitter@buggytracker.net") == null)
             {
                 userManager.Create(new ApplicationUser
                 {
-                    UserName = "ramanglani@coderfoundry.com",
-                    Email = "ramanglani@coderfoundry.com",
-                    FirstName = "Ria",
-                    LastName = "Manglani",
-                    DisplayName = "Ria Manglani"
+                    UserName = "submitter@buggytracker.net",
+                    Email = "submitter@buggytracker.net",
+                    FirstName = "Zang",
+                    LastName = "Li",
+                    DisplayName = "Zang Li"
                 }, "Password-1");
             }
 
             // assign Ria to the ProjectManager role, if not already in it
-            userId = userManager.FindByEmail("ramanglani@coderfoundry.com").Id;
-            if (!userManager.IsInRole(userId, "ProjectManager"))
+            userId = userManager.FindByEmail("submitter@buggytracker.net").Id;
+            if (!userManager.IsInRole(userId, "Submitter"))
             {
-                userManager.AddToRole(userId, "ProjectManager");
+                userManager.AddToRole(userId, "Submitter");
             }
 
 
-            // add TJ to the database
-            if (userManager.FindByEmail("tjones@coderfoundry.com") == null)
-            {
-                userManager.Create(new ApplicationUser
-                {
-                    UserName = "tjones@coderfoundry.com",
-                    Email = "tjones@coderfoundry.com",
-                    FirstName = "TJ",
-                    LastName = "Jones",
-                    DisplayName = "TJ Jones"
-                }, "Password-1");
-            }
-
-
-            // assign TJ to the ProjectManager role, if not already in it
-            userId = userManager.FindByEmail("tjones@coderfoundry.com").Id;
-            if (!userManager.IsInRole(userId, "ProjectManager"))
-            {
-                userManager.AddToRole(userId, "ProjectManager");
-            }
-
+          
 
 
 

@@ -78,6 +78,8 @@
                                 </ul>
                             </li>
                         }
+                        @if (User.IsInRole("Admin") || User.IsInRole("ProjectManager") || User.IsInRole("Developer") || User.IsInRole("Submitter"))
+                        {
                         <li>
                             <a class="dropmenu" href="#"><i class="icon-list-alt icon-white"></i><span class="hidden-tablet"> Ticket</span></a>
                             <ul>
@@ -90,9 +92,13 @@
 
                             </ul>
                         </li>
+                        }
+                        @if (User.IsInRole("Admin") || User.IsInRole("ProjectManager") || User.IsInRole("Developer") || User.IsInRole("Submitter"))
+                        {
                         <li>
-                            <a href="form.html"><i class="icon-edit icon-white"></i><span class="hidden-tablet"> Notifications</span></a>
+                            <a href="@Url.Action("Index", "Notifications")"><i class="icon-edit icon-white"></i><span class="hidden-tablet"> Notifications </span></a>
                         </li>
+                        }
                         @*<li><a href="chart.html"><i class="icon-list-alt icon-white"></i><span class="hidden-tablet"> Charts</span></a></li>
                             <li>
                                 <a class="dropmenu" href="#"><i class="fa-icon-folder-close-alt"></i><span class="hidden-tablet"> Dropdown</span></a>

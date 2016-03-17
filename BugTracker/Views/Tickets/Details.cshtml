@@ -10,9 +10,9 @@
         <div class="col-md-12">
             <div id="container1">
 
-                @if (Model.MediaUrl != null)
+                @if (Model.Attachment != null)
                 {
-                    <center><img src="@Url.Content(Model.MediaUrl)" class="thumbnail" alt="Cinque Terre" width="500" height="500" /></center>
+                    <center><img src="@Url.Content(Model.Attachment)" class="thumbnail" alt="Cinque Terre" width="500" height="500" /></center>
                 }
                 <h1 class="fontsize">
                     @Html.DisplayFor(model => model.Title)
@@ -22,13 +22,14 @@
                         ~ created by: @Model.UserId | Created: @Model.CreationDate.ToString("D") |
                         Priority: <text class="red"><b>@Model.Priority.Name</b></text> |
                         Type: <text class="blue">
-                                  <b>@Model.Type.Name</b>
+                            <b>@Model.Type.Name</b>
                         </text> |
                         Status: <text class="green">
-                                    <b>@Model.Status.Name</b>
+                            <b>@Model.Status.Name</b>
                         </text>
                         ~
                     </em>
+                   
                 </p>
 
                 <br />
@@ -44,7 +45,7 @@
                     <div class="box-header">
                         <h2>
                             <i class="icon-envelope"></i>
-                            <span class="break"></span>Comments
+                            <span class="break"></span><strong>Ticket History</strong>
                         </h2>
                         <div class="box-icon">
 
@@ -53,187 +54,186 @@
                         </div>
                     </div>
                     <div class="box-content ">
-                        @foreach (var c in Model.TicketComments)
-                        {
 
+                        <br />
+                        <div class="main-content">
+                            <div class="container">
 
+                                <div class="page-content">
 
-                            <div id="comments">
-                                <div class="cmmnt">
-                                    <div class="avatar">
-                                        <img src="~/perfectum_dashboard_1_0_5/img/meeple_anon.png" alt="" class=" alignleft" width="60" height="60">
+                               
+                                    <!-- Table Page -->
+                                    <div class="page-tables">
+                                        <!-- Table -->
+                                        <div class="table-responsive">
+                                            <table cellpadding="0" cellspacing="0" border="0" id="data-table" width="100%" class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>History</th>
+                                                       
+                                                       
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                 
+                                                    @foreach (var item in Model.TicketHistories)
+                                                    {
+                                                        <tr>
+                                                            <td>@item.ChangedDate.ToString("D")</td>
+
+                                                            @if (item.Property == "AssignedTo")
+                                                            {
+                                                                <td>@item.User.DisplayName is assigned to Ticket </td>
+                                                            }
+                                                            @if (item.Property == "Removed")
+                                                            {
+                                                                <td>@item.User.DisplayName is removed from Ticket </td>
+                                                            }
+                                                            @if (item.Property == "Title")
+                                                            {
+                                                                @*<td>@item.User.DisplayName is removed from Ticket </td>*@
+                                                                @*<td>@Model.UserId changed the @item.Property from @item.OldValue to @item.NewValue</td>*@
+                                                                <td>@item.User.DisplayName edit Title to @item.New </td>
+                                                            }
+                                                            @if (item.Property == "Description")
+                                                            {
+                                                                <td>@item.User.DisplayName edited Description to @item.New</td>
+                                                            }
+                                                            @if(item.Property == "Priority")
+                                                            {
+                                                                <td>@item.Users.DisplayName edited priority to @item.New</td>
+                                                            }
+
+                                                            @if(item.Property == "Type")
+                                                            {
+                                                                <td>@item.Users.DisplayName edited type to @item.New</td>
+                                                            }
+                                                            @if(item.Property == "Status")
+                                                            {
+                                                                <td>@item.Users.DisplayName edited status to @item.New</td>
+                                                            }
+                                                            @if(item.Property == "Attachment")
+                                                            {
+                                                                <td>@item.Users.DisplayName edited attachment to @item.New</td>
+                                                            }
+
+                                                        </tr>
+                                                        
+
+                                                    }
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>History</th>
+                                                       
+                                                        
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                            <div class="clearfix"></div>
+                                        </div>
                                     </div>
-
-                                    <header class="col-md-12">
-                                        ~
-                                        <b>@c.User.UserName</b> |
-                                        <i>@c.CreationDate.ToString("D")</i> ~
-                                    </header>
-                                    <p>@Html.Raw(c.Body)</p>
-
-                                    <ul class="replies">
-                                        @if (User.IsInRole("Admin"))
-                                        {
-                                            @Html.ActionLink("Delete", "Delete", "TicketComments", new { id = @c.Id }, new { @class = "btn btn-danger" })
-                                        }
-                                    </ul>
                                 </div>
-
-
-
-
-
-                                @*<br />
-                                    <div class="panel panel-primary-dark">
-                                        <div class="panel-body">
-                                            <img src="~/perfectum_dashboard_1_0_5/img/meeple_anon.png" alt="" class=" alignleft" width="65" height="65">
-                                            <p>@Html.Raw(c.Body)</p>
-                                        </div>
-                                        <div class="panel-footer">
-                                            <div class="row">
-                                                <div class="col-lg-10 col-md-9 col-sm-8">
-                                                    @c.User.UserName |
-                                                    @c.CreationDate.ToString("D")
-                                                </div>
-                                                @if (User.IsInRole("Admin"))
-                                                {
-                                                    <div class="col-lg-2 col-md-3 col-sm-4">
-
-                                                        @Html.ActionLink("Delete", "Delete", "TicketComments", new { id = @c.Id }, new { @class = "btn btn-danger" })
-
-                                                    </div>
-                                                }
-
-                                            </div>
-                                        </div>
-                                    </div>*@
                             </div>
 
-                        }
-                    </div>
+                        </div>
+
+
+                        </div>
                 </div>
             </div>
 
-        </div> <!--end col-md-12-->
-        <br />
-        <div class="row">
-            <div class="col-xs-12 col-md-6">
-                @Html.Partial("_TicketComments", new BugTracker.Models.TicketComment { TicketId = Model.Id })
-            </div>
-        </div>
-    </div><!--end row-->
 
-</div><!--end container-->
-<!----------------------------------------------------------->
-@*<h2>Details</h2>
+                        <br />
 
-    <div>
-        <h4>Ticket</h4>
-        <hr />
-        <dl class="dl-horizontal">
-            <dt>
-                @Html.DisplayNameFor(model => model.Project.Title)
-            </dt>
+                        <div class="row-fluid sortable">
+                            <div class="box span12">
 
-            <dd>
-                @Html.DisplayFor(model => model.Project.Title)
-            </dd>
+                                <div class="box-header">
+                                    <h2>
+                                        <i class="icon-envelope"></i>
+                                        <span class="break"></span><strong>Comments</strong>
+                                    </h2>
+                                    <div class="box-icon">
 
-            <dt>
-                @Html.DisplayNameFor(model => model.UserId)
-            </dt>
+                                        <a href="#" class="btn-minimize"><i class="icon-chevron-up"></i></a>
 
-            <dd>
-                @Html.DisplayFor(model => model.UserId)
-            </dd>
-
-            <dt>
-                @Html.DisplayNameFor(model => model.PriorityId)
-            </dt>
-
-            <dd>
-                @Html.DisplayFor(model => model.PriorityId)
-            </dd>
-
-            <dt>
-                @Html.DisplayNameFor(model => model.TypeId)
-            </dt>
-
-            <dd>
-                @Html.DisplayFor(model => model.TypeId)
-            </dd>
-
-            <dt>
-                @Html.DisplayNameFor(model => model.StatusId)
-            </dt>
-
-            <dd>
-                @Html.DisplayFor(model => model.StatusId)
-            </dd>
-
-            <dt>
-                @Html.DisplayNameFor(model => model.Description)
-            </dt>
-
-            <dd>
-                @Html.DisplayFor(model => model.Description)
-            </dd>
-
-            <dt>
-                @Html.DisplayNameFor(model => model.Title)
-            </dt>
-
-            <dd>
-                @Html.DisplayFor(model => model.Title)
-            </dd>
-
-            <dt>
-                @Html.DisplayNameFor(model => model.CreationDate)
-            </dt>
-
-            <dd>
-                @Html.DisplayFor(model => model.CreationDate)
-            </dd>
-
-            <dt>
-                @Html.DisplayNameFor(model => model.Updated)
-            </dt>
-
-            <dd>
-                @Html.DisplayFor(model => model.Updated)
-            </dd>
-
-            <dt>
-                @Html.DisplayNameFor(model => model.MediaUrl)
-            </dt>
-
-            <dd>
-                @Html.DisplayFor(model => model.MediaUrl)
-            </dd>
-
-        </dl>
-    </div>*@
-@*<p>
-        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-        @Html.ActionLink("Back to List", "Index")
-    </p>*@
+                                    </div>
+                                </div>
+                                <div class="box-content ">
+                                    @foreach (var c in Model.TicketComments)
+                                    {
 
 
 
+                                        <div id="comments">
+                                            <div class="cmmnt">
+                                                <div class="avatar">
+                                                    <img src="~/perfectum_dashboard_1_0_5/img/meeple_anon.png" alt="" class=" alignleft" width="60" height="60">
+                                                </div>
+
+                                                <header class="col-md-12">
+                                                    ~
+                                                    <b>@c.User.UserName</b> |
+                                                    <i>@c.CreationDate.ToString("D")</i> ~
+                                                </header>
+                                                <p>@Html.Raw(c.Body)</p>
+
+                                                <ul class="replies">
+                                                    @if (User.IsInRole("Admin"))
+                                                    {
+                                                        @Html.ActionLink("Delete", "Delete", "TicketComments", new { id = @c.Id }, new { @class = "btn btn-danger" })
+                                                    }
+                                                </ul>
+                                            </div>
+
+                                        </div>
+
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                    </div> <!--end col-md-12-->
+                    <br />
+                    <div class="row">
+                        <div class="col-xs-12 col-md-6">
+                            @Html.Partial("_TicketComments", new BugTracker.Models.TicketComment { TicketId = Model.Id })
+                        </div>
+                    </div>
+                </div><!--end row-->
+
+            </div><!--end container-->
+         
 
 
+<!--------------------------------------------------------------------------------------------------------------------------------->
+            @section Scripts{
+                <script type="text/javascript" src='//cdn.tinymce.com/4/tinymce.min.js'></script>
+                <script type="text/javascript">
+                    tinymce.init({
+                        selector: 'textarea',
+                        theme: 'modern',
+                        width: 1200,
+                        height: 200,
 
+                    });
+                </script>
 
-@section Scripts{
-    <script type="text/javascript" src='//cdn.tinymce.com/4/tinymce.min.js'></script>
     <script type="text/javascript">
-        tinymce.init({
-            selector: 'textarea',
-            theme: 'modern',
-            width: 1200,
-            height: 200,
+		/* ****************************************** */
+		/* Data Table JS */
+		/* ****************************************** */
 
-        });
+		$(document).ready(function() {
+			$('#data-table').dataTable({
+			   "sPaginationType": "full_numbers"
+			});
+		});
+
     </script>
 
-}
+            }

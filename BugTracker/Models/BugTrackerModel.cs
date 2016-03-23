@@ -33,8 +33,7 @@ namespace BugTracker.Models
 
         public DateTimeOffset CreationDate { get; set; }
         public string Attachment { get; set; }
-
-        //public virtual ApplicationUser EntryUser { get; set; }
+        
         public virtual TicketPriority Priority { get; set; }
         public virtual TicketType Type { get; set; }
         public virtual TicketStatus Status { get; set; } 
@@ -46,49 +45,50 @@ namespace BugTracker.Models
         
         public virtual ICollection<ApplicationUser> AssignTicketUsers { get; set; }
 
-        //private int BodyTextLimit = 200;
+        private int BodyTextLimit = 10;
 
-        //public string BodyTextTrimmed
-        //{
-        //    get
-        //    {
-        //        if (this.Description.Length > this.BodyTextLimit)
-        //            return this.Description.Substring(0, this.BodyTextLimit) + "...";
-        //        else
-        //            return this.Description;
-        //    }
-        //}
-
-
-        public static class ImageUploadValidator
+        public string BodyTextTrimmed
         {
-            public static bool IsWebFriendlyImage(HttpPostedFileBase fileUpload)
+            get
             {
-                //check for actual object
-                if (fileUpload == null)
-                    return false;
-
-                //check size - file must be  less than 2 MB and greater than 1 KB
-                if (fileUpload.ContentLength > 2 * 1024 * 1024)
-                    return false;
-
-                try
-                {
-                    using (var img = Image.FromStream(fileUpload.InputStream))
-                    {
-                        return ImageFormat.Jpeg.Equals(img.RawFormat) ||
-                               ImageFormat.Png.Equals(img.RawFormat) ||
-                               ImageFormat.Gif.Equals(img.RawFormat);
-                    }
-                }
-
-                catch
-                {
-
-                    return false;
-                }
+                if (this.Description.Length > this.BodyTextLimit)
+                    return this.Description.Substring(0, this.BodyTextLimit) + "...";
+                else
+                    return this.Description;
             }
         }
+
+
+        //public static class ImageUploadValidator
+        //{
+        //    public static bool IsWebFriendlyImage(HttpPostedFileBase fileUpload)
+        //    {
+        //        //check for actual object
+        //        if (fileUpload == null)
+        //            return false;
+
+        //        //check size - file must be  less than 2 MB and greater than 1 KB
+        //        if (fileUpload.ContentLength > 2 * 1024 * 1024)
+        //            return false;
+
+        //        try
+        //        {
+        //            using (var img = Image.FromStream(fileUpload.InputStream))
+        //            {
+        //                return ImageFormat.Jpeg.Equals(img.RawFormat) ||
+        //                       ImageFormat.Png.Equals(img.RawFormat) ||
+        //                       ImageFormat.Gif.Equals(img.RawFormat);
+        //            }
+
+        //        }
+
+        //        catch
+        //        {
+
+        //            return false;
+        //        }
+        //    }
+        //}
 
 
 
@@ -113,7 +113,7 @@ namespace BugTracker.Models
 
 
 
-        //private int BodyTextLimit = 200;
+        //private int BodyTextLimit = 30;
 
         //public string BodyTextTrimmed
         //{
@@ -129,7 +129,6 @@ namespace BugTracker.Models
 
         public virtual ICollection<ApplicationUser> AssignProjectUsers { get; set; }
         public virtual ICollection<Ticket> Tickets { get; set; }
-        //public virtual ICollection<ApplicationUser> ProjectUsers { get; set; }
       
 
     }
@@ -180,20 +179,7 @@ namespace BugTracker.Models
 
         public string MediaUrl { get; set; }
         public string NewMediaUrl { get; set; }
-
-
-        //private int BodyTextLimit = 600;
-
-        //public string BodyTextTrimmed
-        //{
-        //    get
-        //    {
-        //        if (this.Description.Length > this.BodyTextLimit)
-        //            return this.Description.Substring(0, this.BodyTextLimit) + "...";
-        //        else
-        //            return this.Description;
-        //    }
-        //}
+        
         
         public virtual ApplicationUser Users { get; set; }
         public virtual Ticket Ticket { get; set; }

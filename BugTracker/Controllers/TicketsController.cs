@@ -13,11 +13,14 @@ using BugTracker.Helper;
 
 namespace BugTracker.Controllers
 {
+    [Authorize]
     public class TicketsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Tickets
+        [Authorize]
+        [HttpGet]
         public ActionResult Index()
         {
             var user = db.Users.Find(User.Identity.GetUserId());
@@ -32,8 +35,13 @@ namespace BugTracker.Controllers
                 var tickets = db.Tickets.Where(t => t.UserId == user.UserName).Include(t => t.Project).Include(t => t.Priority).Include(t => t.Type).Include(t => t.Status).ToList();
                 return View(tickets);
             }
-            
-            else if(User.IsInRole("Admin") || User.IsInRole("ProjectManager")){
+            else if (User.IsInRole("ProjectManager"))
+            {
+                var tickets = db.Tickets.Where(t => t.UserId == user.UserName).Include(t => t.Project).Include(t => t.Priority).Include(t => t.Type).Include(t => t.Status).ToList();
+                return View(tickets);
+            }
+
+            else if(User.IsInRole("Admin")){
 
                 var tickets = db.Tickets.Include(t => t.Project).Include(t => t.Priority).Include(t => t.Type).Include(t => t.Status).ToList();
                 return View(tickets);
@@ -49,8 +57,20 @@ namespace BugTracker.Controllers
         }
 
         // GET: Tickets/Details/5
+        [Authorize(Roles = "Admin, ProjectManager, Developer, Submitter")]
+        [HttpGet]
         public ActionResult Details(int? id)
         {
+          
+            UserTicketsHelper helperticket = new UserTicketsHelper();
+            var user = db.Users.Find(User.Identity.GetUserId());
+
+
+
+            Ticket userTickets = db.Tickets.FirstOrDefault(u => u.Id == id);
+
+            
+
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -60,10 +80,49 @@ namespace BugTracker.Controllers
             {
                 return HttpNotFound();
             }
+
+            if (User.IsInRole("Admin"))
+            {
+                return View(ticket);
+            }
+
+            if (User.IsInRole("ProjectManager"))
+            {
+             
+                var tickets = db.Tickets.ToList();
+               
+                List<Ticket> ticketsProject = (from project in user.Projects.ToList()
+                                               from t in (tickets.Where(t => t.ProjectId == project.Id))
+                                               where t.AssignedToUserId != user.Id
+                                               select t).ToList();
+                
+                if(!ticketsProject.Contains(userTickets))
+                {
+                    return RedirectToAction("Unauthorized", "Error");
+                }
+            }
+            if (User.IsInRole("Developer"))
+            {
+                if (!helperticket.IsUserInTicket(user.Id, userTickets.Id))
+                {
+                    return RedirectToAction("Unauthorized", "Error");
+                }
+            }
+            if (User.IsInRole("Submitter"))
+            {
+                if(user.UserName != userTickets.UserId)
+                {
+                    return RedirectToAction("Unauthorized", "Error");
+                }
+            }
+
+
             return View(ticket);
         }
 
         // GET: Tickets/Create
+        [Authorize(Roles = "Admin, ProjectManager, Developer, Submitter")]
+        [HttpGet]
         public ActionResult Create()
         {
             
@@ -80,21 +139,29 @@ namespace BugTracker.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin, ProjectManager, Developer, Submitter")]
         public ActionResult Create([Bind(Include = "Id,UserId,ProjectId,PriorityId,TypeId,StatusId,Description,Title,CreationDate,Attachment")] Ticket ticket, HttpPostedFileBase fileUpload)
         {
             ticket.CreationDate = new DateTimeOffset(DateTime.Now);
 
             if (ModelState.IsValid)
             {
-                
 
-                // restricting the valid file formats to images only
-                if (Ticket.ImageUploadValidator.IsWebFriendlyImage(fileUpload))
+
+                //// restricting the valid file formats to images only
+                //if (Ticket.ImageUploadValidator.IsWebFriendlyImage(fileUpload))
+                //{
+                //    var fileName = Path.GetFileName(fileUpload.FileName);
+                //    fileUpload.SaveAs(Path.Combine(Server.MapPath("~/img/"), fileName));
+                //    ticket.Attachment = "~/img/" + fileName;
+
+                //}
+
+                if(fileUpload != null && fileUpload.ContentLength > 0)
                 {
                     var fileName = Path.GetFileName(fileUpload.FileName);
-                    fileUpload.SaveAs(Path.Combine(Server.MapPath("~/img/"), fileName));
-                    ticket.Attachment = "~/img/" + fileName;
-
+                        fileUpload.SaveAs(Path.Combine(Server.MapPath("~/documents/"), fileName));
+                        ticket.Attachment = "~/documents/" + fileName;
                 }
 
                 var user = db.Users.Find(User.Identity.GetUserId());
@@ -107,7 +174,7 @@ namespace BugTracker.Controllers
 
                 db.Tickets.Add(ticket);
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Dashboard", "Home");
             }
             
 
@@ -164,7 +231,6 @@ namespace BugTracker.Controllers
             UserTicketsHelper helper = new UserTicketsHelper();
             Ticket ticket = new Ticket();
             var userId = User.Identity.GetUserId();
-            TicketHistoryHelper thHelper = new TicketHistoryHelper();
             var changed = DateTimeOffset.Now;
             var select = helper.UsersInTicket(ticketId).Select(i => i.Id);
             
@@ -180,19 +246,16 @@ namespace BugTracker.Controllers
                     if (assignuser.SelectedUser.Contains(user.Id))
                     {
                         helper.AddUserToTicket(user.Id, ticketId);
-                        
-                      
+
                     }
 
                     else
                     {
                         helper.RemoveUserFromTicket(user.Id, ticketId);
-                        
+
                     }
                 }
-           
-
-
+                
 
                 db.SaveChanges();
             }
@@ -205,8 +268,18 @@ namespace BugTracker.Controllers
 
 
         // GET: Tickets/Edit/5
+        [Authorize(Roles = "Admin, ProjectManager, Developer")]
+        [HttpGet]
         public ActionResult Edit(int? id)
         {
+
+            UserTicketsHelper helperticket = new UserTicketsHelper();
+            var user = db.Users.Find(User.Identity.GetUserId());
+
+            Ticket userTickets = db.Tickets.FirstOrDefault(u => u.Id == id);
+
+           
+
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -215,6 +288,37 @@ namespace BugTracker.Controllers
             if (ticket == null)
             {
                 return HttpNotFound();
+            }
+            
+
+            if (User.IsInRole("ProjectManager"))
+            {
+
+                var tickets = db.Tickets.ToList();
+
+                List<Ticket> ticketsProject = (from project in user.Projects.ToList()
+                                               from t in (tickets.Where(t => t.ProjectId == project.Id))
+                                               where t.AssignedToUserId != user.Id
+                                               select t).ToList();
+
+                if (!ticketsProject.Contains(userTickets))
+                {
+                    return RedirectToAction("Unauthorized", "Error");
+                }
+            }
+            if (User.IsInRole("Developer"))
+            {
+                if (!helperticket.IsUserInTicket(user.Id, userTickets.Id))
+                {
+                    return RedirectToAction("Unauthorized", "Error");
+                }
+            }
+            if (User.IsInRole("Submitter"))
+            {
+                if (user.UserName != userTickets.UserId)
+                {
+                    return RedirectToAction("Unauthorized", "Error");
+                }
             }
             ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Title", ticket.ProjectId);
             ViewBag.PriorityId = new SelectList(db.TicketPriorities, "Id", "Name", ticket.PriorityId);
@@ -229,13 +333,13 @@ namespace BugTracker.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin, ProjectManager, Developer, Submitter")]
         public ActionResult Edit([Bind(Include = "Id,UserId,ProjectId,PriorityId,TypeId,StatusId,Description,Title,CreationDate,Attachment")] Ticket ticket, HttpPostedFileBase fileUpload)
         {
             
 
             if (ModelState.IsValid)
             {
-                TicketHistoryHelper thHelper = new TicketHistoryHelper();
                 UserTicketsHelper helper = new UserTicketsHelper();
                 var user = db.Users.Find(User.Identity.GetUserId());
                 var OldTicket = db.Tickets.AsNoTracking().FirstOrDefault(t => t.Id == ticket.Id);
@@ -245,21 +349,20 @@ namespace BugTracker.Controllers
 
                 ticket.AssignTicketUsers = helper.UsersInTicket(ticket.Id);
                 Notification notification = new Notification();
-                
+                TicketHistory ticketHistorys = new TicketHistory();
 
                 if (OldTicket.Title != ticket.Title)
                 {
-                    TicketHistory ticketHistorys = new TicketHistory
-                    {
-                        TicketId = ticket.Id,
-                        Property = "Title",
-                        Old = OldTicket.Title,
-                        OldValue = OldTicket.Title,
-                        New = ticket.Title,
-                        NewValue = ticket.Title,
-                        ChangedDate = changedDate,
-                        UserId = user.Id
-                    };
+
+                    ticketHistorys.TicketId = ticket.Id;
+                    ticketHistorys.Property = "Title";
+                      ticketHistorys.Old = OldTicket.Title;
+                      ticketHistorys.OldValue = OldTicket.Title;
+                      ticketHistorys.New = ticket.Title;
+                     ticketHistorys.NewValue = ticket.Title;
+                   ticketHistorys.ChangedDate = changedDate;
+                     ticketHistorys.UserId = user.Id;
+                   
                     db.TicketHistories.Add(ticketHistorys);
 
 
@@ -282,24 +385,23 @@ namespace BugTracker.Controllers
 
                 if(OldTicket.Description != ticket.Description)
                 {
-                    TicketHistory ticketHistorys = new TicketHistory
-                    {
-                        TicketId = ticket.Id,
-                        Property = "Description",
-                        Old = OldTicket.Description,
-                        OldValue = OldTicket.Description,
-                        New = ticket.Description,
-                        NewValue = ticket.Description,
-                        ChangedDate = changedDate,
-                        UserId = user.Id
-                    };
+
+                    ticketHistorys.TicketId = ticket.Id;
+                    ticketHistorys.Property = "Description";
+                    ticketHistorys.Old = OldTicket.Description;
+                    ticketHistorys.OldValue = OldTicket.Description;
+                    ticketHistorys.New = ticket.Description;
+                    ticketHistorys.NewValue = ticket.Description;
+                    ticketHistorys.ChangedDate = changedDate;
+                       ticketHistorys.UserId = user.Id;
+                    
                     db.TicketHistories.Add(ticketHistorys);
 
 
                     foreach (var item in ticket.AssignTicketUsers.ToList())
                     {
                         notification.TicketId = ticket.Id;
-                        notification.CreatorUserId = user.Id;
+                        notification.CreatorUserId = user.UserName;
                         notification.Creator = user;
                         notification.RecipientUserId = item.Id;
                         notification.Recipient = db.Users.Find(item.UserName);
@@ -315,57 +417,59 @@ namespace BugTracker.Controllers
 
                 if (OldTicket.PriorityId != ticket.PriorityId)
                 {
-                    TicketHistory ticketHistorys = new TicketHistory
-                    {
-                        TicketId = ticket.Id,
-                        Property = "Priority",
-                        Old = OldTicket.Priority.Name,
-                        OldValue = OldTicket.Priority.Name,
-                        New = ticket.Priority.Name,
-                        NewValue = ticket.Priority.Name,
-                        ChangedDate = changedDate,
-                        UserId = user.Id
-                    };
-                    db.TicketHistories.Add(ticketHistorys);
+                    ticket.Priority = db.TicketPriorities.Find(ticket.PriorityId);
 
+
+                    ticketHistorys.TicketId = ticket.Id;
+                     ticketHistorys.Property = "Priority";
+                      ticketHistorys.Old = OldTicket.Priority.Name;
+                      ticketHistorys.OldValue = OldTicket.Priority.Name;
+                     ticketHistorys.New = ticket.Priority.Name;
+                     ticketHistorys.NewValue = ticket.Priority.Name;
+                     ticketHistorys.ChangedDate = changedDate;
+                      ticketHistorys.UserId = user.Id;
+                
+                    
+                    db.TicketHistories.Add(ticketHistorys);
+                    db.SaveChanges();
 
                     foreach (var item in ticket.AssignTicketUsers.ToList())
                     {
                         notification.TicketId = ticket.Id;
-                        notification.CreatorUserId = user.Id;
+                        notification.CreatorUserId = user.UserName;
                         notification.Creator = user;
                         notification.RecipientUserId = item.Id;
                         notification.Recipient = db.Users.Find(item.UserName);
                         notification.Change = "Changed Priority";
                         notification.DateNotified = changedDate;
-
-
+                        
                         db.Notifications.Add(notification);
-                        db.SaveChanges();
+                    
                     }
 
                 }
 
                 if (OldTicket.StatusId != ticket.StatusId)
                 {
-                    TicketHistory ticketHistorys = new TicketHistory
-                    {
-                        TicketId = ticket.Id,
-                        Property = "Status",
-                        Old = OldTicket.Status.Name,
-                        OldValue = OldTicket.Status.Name,
-                        New = ticket.Status.Name,
-                        NewValue = ticket.Status.Name,
-                        ChangedDate = changedDate,
-                        UserId = user.Id
-                    };
+                    ticket.Status = db.TicketStatuses.Find(ticket.StatusId);
+
+
+                    ticketHistorys.TicketId = ticket.Id;
+                     ticketHistorys.Property = "Status";
+                      ticketHistorys.Old = OldTicket.Status.Name;
+                      ticketHistorys.OldValue = OldTicket.Status.Name;
+                      ticketHistorys.New = ticket.Status.Name;
+                      ticketHistorys.NewValue = ticket.Status.Name;
+                      ticketHistorys.ChangedDate = changedDate;
+                      ticketHistorys.UserId = user.Id;
+                  
                     db.TicketHistories.Add(ticketHistorys);
 
 
                     foreach (var item in ticket.AssignTicketUsers.ToList())
                     {
                         notification.TicketId = ticket.Id;
-                        notification.CreatorUserId = user.Id;
+                        notification.CreatorUserId = user.UserName;
                         notification.Creator = user;
                         notification.RecipientUserId = item.Id;
                         notification.Recipient = db.Users.Find(item.UserName);
@@ -381,24 +485,24 @@ namespace BugTracker.Controllers
 
                 if (OldTicket.TypeId != ticket.TypeId)
                 {
-                    TicketHistory ticketHistorys = new TicketHistory
-                    {
-                        TicketId = ticket.Id,
-                        Property = "Status",
-                        Old = OldTicket.Type.Name,
-                        OldValue = OldTicket.Type.Name,
-                        New = ticket.Type.Name,
-                        NewValue = ticket.Type.Name,
-                        ChangedDate = changedDate,
-                        UserId = user.Id
-                    };
+                    ticket.Type = db.TicketTypes.Find(ticket.TypeId);
+
+                    ticketHistorys.TicketId = ticket.Id;
+                    ticketHistorys.Property = "Type";
+                    ticketHistorys.Old = OldTicket.Type.Name;
+                    ticketHistorys.OldValue = OldTicket.Type.Name;
+                    ticketHistorys.New = ticket.Type.Name;
+                    ticketHistorys.NewValue = ticket.Type.Name;
+                    ticketHistorys.ChangedDate = changedDate;
+                      ticketHistorys.UserId = user.Id;
+                  
                     db.TicketHistories.Add(ticketHistorys);
 
 
                     foreach (var item in ticket.AssignTicketUsers.ToList())
                     {
                         notification.TicketId = ticket.Id;
-                        notification.CreatorUserId = user.Id;
+                        notification.CreatorUserId = user.UserName;
                         notification.Creator = user;
                         notification.RecipientUserId = item.Id;
                         notification.Recipient = db.Users.Find(item.UserName);
@@ -414,24 +518,23 @@ namespace BugTracker.Controllers
 
                 if (OldTicket.Attachment != ticket.Attachment)
                 {
-                    TicketHistory ticketHistorys = new TicketHistory
-                    {
-                        TicketId = ticket.Id,
-                        Property = "Status",
-                        Old = OldTicket.Attachment,
-                        OldValue = OldTicket.Attachment,
-                        New = ticket.Attachment,
-                        NewValue = ticket.Attachment,
-                        ChangedDate = changedDate,
-                        UserId = user.Id
-                    };
+
+                    ticketHistorys.TicketId = ticket.Id;
+                    ticketHistorys.Property = "Attachment";
+                    ticketHistorys.Old = OldTicket.Attachment;
+                    ticketHistorys.OldValue = OldTicket.Attachment;
+                    ticketHistorys.New = ticket.Attachment;
+                    ticketHistorys.NewValue = ticket.Attachment;
+                    ticketHistorys.ChangedDate = changedDate;
+                    ticketHistorys.UserId = user.Id;
+                   
                     db.TicketHistories.Add(ticketHistorys);
 
 
                     foreach (var item in ticket.AssignTicketUsers.ToList())
                     {
                         notification.TicketId = ticket.Id;
-                        notification.CreatorUserId = user.Id;
+                        notification.CreatorUserId = user.UserName;
                         notification.Creator = user;
                         notification.RecipientUserId = item.Id;
                         notification.Recipient = db.Users.Find(item.UserName);
@@ -454,17 +557,22 @@ namespace BugTracker.Controllers
                 fetched.Title = ticket.Title;
                 fetched.Description = ticket.Description;
 
-                
+
                 // restricting the valid file formats to images only
-                if (Ticket.ImageUploadValidator.IsWebFriendlyImage(fileUpload))
+                //if (Ticket.ImageUploadValidator.IsWebFriendlyImage(fileUpload))
+                //{
+                //    var fileName = Path.GetFileName(fileUpload.FileName);
+                //    fileUpload.SaveAs(Path.Combine(Server.MapPath("~/img/"), fileName));
+                //    fetched.Attachment = "~/img/" + fileName;
+
+                //}
+                if (fileUpload != null && fileUpload.ContentLength > 0)
                 {
                     var fileName = Path.GetFileName(fileUpload.FileName);
-                    fileUpload.SaveAs(Path.Combine(Server.MapPath("~/img/"), fileName));
-                    fetched.Attachment = "~/img/" + fileName;
-
+                    fileUpload.SaveAs(Path.Combine(Server.MapPath("~/documents/"), fileName));
+                    ticket.Attachment = "~/documents/" + fileName;
                 }
 
-                
 
                 db.Entry(fetched).State = EntityState.Modified;
                 db.SaveChanges();
@@ -476,8 +584,12 @@ namespace BugTracker.Controllers
             ViewBag.StatusId = new SelectList(db.TicketStatuses, "Id", "Name", ticket.StatusId);
             return View(ticket);
         }
+        
+        
 
         // GET: Tickets/Delete/5
+        [Authorize(Roles = "Admin, ProjectManager")]
+        [HttpGet]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -495,6 +607,7 @@ namespace BugTracker.Controllers
         // POST: Tickets/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin, ProjectManager")]
         public ActionResult DeleteConfirmed(int id)
         {
             Ticket ticket = db.Tickets.Find(id);

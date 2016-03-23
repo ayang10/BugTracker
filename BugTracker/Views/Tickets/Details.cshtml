@@ -10,32 +10,39 @@
         <div class="col-md-12">
             <div id="container1">
 
-                @if (Model.Attachment != null)
-                {
-                    <center><img src="@Url.Content(Model.Attachment)" class="thumbnail" alt="Cinque Terre" width="500" height="500" /></center>
-                }
-                <h1 class="fontsize">
-                    @Html.DisplayFor(model => model.Title)
-                </h1>
-                <p class="page-header no-margin">
-                    <em>
-                        ~ created by: @Model.UserId | Created: @Model.CreationDate.ToString("D") |
-                        Priority: <text class="red"><b>@Model.Priority.Name</b></text> |
-                        Type: <text class="blue">
-                            <b>@Model.Type.Name</b>
-                        </text> |
-                        Status: <text class="green">
-                            <b>@Model.Status.Name</b>
-                        </text>
-                        ~
-                    </em>
-                   
-                </p>
+                <h1 class=" fontsize">
+                        @Model.Title
+                        </h1>
+                        <p class="page-header no-margin">
+                            <em>
+                                ~ created by: @Model.UserId | Created: @Model.CreationDate.ToString("D") |
+                                Priority: <text class="red"><b>@Model.Priority.Name</b></text> |
+                                Type: <text class="blue">
+                                    <b>@Model.Type.Name</b>
+                                </text> |
+                                Status: <text class="green">
+                                    <b>@Model.Status.Name</b>
+                                </text> | 
+                                @if (Model.Attachment != null)
+                                {
 
-                <br />
-                <p>@Html.Raw(Model.Description)</p>
+                                    <span class="fa fa-icon-paper-clip"></span> <a href="@Url.Content(Model.Attachment)" target="_blank">Attachment</a>
 
-            </div>
+                                }
+                                else
+                                {
+                                    <span class="fa fa-icon-paper-clip"></span> <strong>No Attachment</strong>
+                                }
+                                ~
+                            </em>
+
+                        </p>
+
+                        <br />
+                        <p>@Html.Raw(Model.Description)</p>
+                
+
+</div>
 
             <br />
 
@@ -93,30 +100,28 @@
                                                             }
                                                             @if (item.Property == "Title")
                                                             {
-                                                                @*<td>@item.User.DisplayName is removed from Ticket </td>*@
-                                                                @*<td>@Model.UserId changed the @item.Property from @item.OldValue to @item.NewValue</td>*@
                                                                 <td>@item.User.DisplayName edit Title to @item.New </td>
                                                             }
                                                             @if (item.Property == "Description")
                                                             {
-                                                                <td>@item.User.DisplayName edited Description to @item.New</td>
+                                                                <td>@item.User.DisplayName edited Description</td>
                                                             }
-                                                            @if(item.Property == "Priority")
+                                                            @if (item.Property == "Priority")
                                                             {
-                                                                <td>@item.Users.DisplayName edited priority to @item.New</td>
+                                                                <td>@item.User.DisplayName edited priority to @item.New</td>
                                                             }
 
                                                             @if(item.Property == "Type")
                                                             {
-                                                                <td>@item.Users.DisplayName edited type to @item.New</td>
+                                                                <td>@item.User.DisplayName edited type to @item.New</td>
                                                             }
                                                             @if(item.Property == "Status")
                                                             {
-                                                                <td>@item.Users.DisplayName edited status to @item.New</td>
+                                                                <td>@item.User.DisplayName edited status to @item.New</td>
                                                             }
                                                             @if(item.Property == "Attachment")
                                                             {
-                                                                <td>@item.Users.DisplayName edited attachment to @item.New</td>
+                                                                <td>@item.User.DisplayName edited attachment to @item.New</td>
                                                             }
 
                                                         </tr>

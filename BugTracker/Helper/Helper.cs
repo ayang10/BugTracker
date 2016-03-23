@@ -5,7 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
+using System.Net.Mime;
+using System.Security.Policy;
+using System.Threading.Tasks;
 using System.Web;
+using System.Web.Mvc;
 
 namespace BugTracker.Helper
 {
@@ -40,29 +46,41 @@ namespace BugTracker.Helper
         public IList<ApplicationUser> UsersInRole(string roleName)
         {
             var db = new ApplicationDbContext();
-            var resultList = new List<ApplicationUser>();
 
-            foreach (var user in db.Users)
-            {
-                if (IsUserInRole(user.Id, roleName))
-                {
-                    resultList.Add(user);
-                }
-            }
+            //var resultList = new List<ApplicationUser>();
+
+            //foreach (var user in db.Users)
+            //{
+            //    if (IsUserInRole(user.Id, roleName))
+            //    {
+            //        resultList.Add(user);
+            //    }
+            //}
+
+            List<ApplicationUser> resultList = (from user in db.Users
+                                                 where IsUserInRole(user.Id, roleName)
+                                                 select user).ToList();
+
             return resultList;
         }
 
         public IList<ApplicationUser> UsersNotInRole(string roleName)
         {
-            var resultList = new List<ApplicationUser>();
+            //var resultList = new List<ApplicationUser>();
 
-            foreach (var user in manager.Users)
-            {
-                if (!IsUserInRole(user.Id, roleName))
-                {
-                    resultList.Add(user);
-                }
-            }
+            //foreach (var user in manager.Users)
+            //{
+            //    if (!IsUserInRole(user.Id, roleName))
+            //    {
+            //        resultList.Add(user);
+            //    }
+            //}
+
+            List<ApplicationUser> resultList = (from user in manager.Users
+                                                where !IsUserInRole(user.Id, roleName)
+                                                select user).ToList();
+
+
             return resultList;
         }
     }
@@ -76,6 +94,7 @@ namespace BugTracker.Helper
         {
             return db.Users.Find(userId).Projects.Any(p => p.Id == projectId);
         }
+        
 
         public IList<Project> ListUserProjects(string userId)
         {
@@ -121,30 +140,40 @@ namespace BugTracker.Helper
 
         public IList<ApplicationUser> UsersInProject(int projectId)
         {
-            var resultList = new List<ApplicationUser>();
+            //var resultList = new List<ApplicationUser>();
             
                
-            foreach (var user in db.Users.ToList())
-            {
-                if (IsUserInProject(user.Id, projectId))
-                {
-                    resultList.Add(user);
-                }
-            }
+            //foreach (var user in db.Users.ToList())
+            //{
+            //    if (IsUserInProject(user.Id, projectId))
+            //    {
+            //        resultList.Add(user);
+            //    }
+            //}
+
+            List<ApplicationUser> resultList = (from user in db.Users.ToList()
+                                                where IsUserInProject(user.Id, projectId)
+                                                select user).ToList();
+
             return resultList;
         }
 
         public IList<ApplicationUser> UsersNotInProject(int projectId)
         {
-            var resultList = new List<ApplicationUser>();
+            //var resultList = new List<ApplicationUser>();
 
-            foreach (var user in db.Users.ToList())
-            {
-                if (!IsUserInProject(user.Id, projectId))
-                {
-                    resultList.Add(user);
-                }
-            }
+            //foreach (var user in db.Users.ToList())
+            //{
+            //    if (!IsUserInProject(user.Id, projectId))
+            //    {
+            //        resultList.Add(user);
+            //    }
+            //}
+
+            List<ApplicationUser> resultList = (from user in db.Users.ToList()
+                                                where !IsUserInProject(user.Id, projectId)
+                                                select user).ToList();
+
             return resultList;
         }
 
@@ -184,15 +213,17 @@ namespace BugTracker.Helper
             var user = db.Users.Find(userId);
             var ticket = db.Tickets.Find(ticketId);
             var changed = DateTimeOffset.Now;
-            TicketHistoryHelper thHelper = new TicketHistoryHelper();
+     
             if (!IsUserInTicket(userId, ticketId))
             {
+                
 
                 TicketHistory something = new TicketHistory
                 {
                     TicketId = ticketId,
                     Property = "AssignedTo",
                     ChangedDate = changed,
+
                     UserId = userId
                     
 
@@ -213,11 +244,26 @@ namespace BugTracker.Helper
                 };
                 db.Notifications.Add(ticketAssignment);
 
+                string defaultEmail = "buggytracker@buggytracker.net";
 
-                //if (ticket.AssignedToUserId != null && ticketAssignment.CreatorUserId != ticket.AssignedToUserId)
-                //{
-                //    thHelper.AssignmentNotification(ticketAssignment);
-                //}
+                //Build Email Message
+                MailMessage mailMessage = new MailMessage();
+                    mailMessage.To.Add(new MailAddress(ticketAssignment.Recipient.UserName, ticketAssignment.Recipient.UserName));
+                mailMessage.From = new MailAddress(defaultEmail, "BuggyTracker");
+                mailMessage.Subject = "BuggyTracker - You have been Assigned a new Ticket";
+                    
+                    string bodytext = String.Concat("You've been assigned to " + "Ticket:" + ticket.Title + " in " + "Project:" + ticket.Project.Title + "." +
+                        "<p>Do not respond back to email.</p>");
+                    mailMessage.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(bodytext, null, MediaTypeNames.Text.Html));
+
+                    //Initialise SmtpClient and send
+                    SmtpClient smtpClient = new SmtpClient("smtp.sendgrid.net", Convert.ToInt32(587));
+                    var SendGridCredentials = db.SendgridCredentials.First();
+                    NetworkCredential credentials = new NetworkCredential(SendGridCredentials.UserName, SendGridCredentials.Password);
+                    smtpClient.Credentials = credentials;
+                    smtpClient.Send(mailMessage);
+                
+               
 
                 ticket.AssignTicketUsers.Add(user);
                 db.Entry(ticket).State = EntityState.Modified;
@@ -239,13 +285,14 @@ namespace BugTracker.Helper
             var changed = DateTimeOffset.Now;
             if (IsUserInTicket(userId, ticketId))
             {
-               
-                    TicketHistory something = new TicketHistory
-                    {
-                        TicketId = ticketId,
-                        Property = "Removed",
-                        ChangedDate = changed,
-                        
+
+
+                TicketHistory something = new TicketHistory
+                {
+                    TicketId = ticketId,
+                    Property = "Removed",
+                    ChangedDate = changed,
+                 
                         UserId = userId
 
                     };
@@ -265,6 +312,28 @@ namespace BugTracker.Helper
                 };
                 db.Notifications.Add(ticketAssignment);
 
+
+                string defaultEmail = "buggytracker@buggytracker.net";
+
+                //Build Email Message
+                MailMessage mailMessage = new MailMessage();
+                mailMessage.To.Add(new MailAddress(ticketAssignment.Recipient.UserName, ticketAssignment.Recipient.UserName));
+                mailMessage.From = new MailAddress(defaultEmail, "BuggyTracker");
+                mailMessage.Subject = "BuggyTracker - You have been Removed from ticket:" + ticket.Title;
+
+                string bodytext = String.Concat("You've been Removed from " + "Ticket:" + ticket.Title + " in " + "Project:" + ticket.Project.Title + "." +
+                    "<p>Do not respond back to email.</p>");
+                mailMessage.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(bodytext, null, MediaTypeNames.Text.Html));
+
+                //Initialise SmtpClient and send
+                SmtpClient smtpClient = new SmtpClient("smtp.sendgrid.net", Convert.ToInt32(587));
+                var SendGridCredentials = db.SendgridCredentials.First();
+                NetworkCredential credentials = new NetworkCredential(SendGridCredentials.UserName, SendGridCredentials.Password);
+                smtpClient.Credentials = credentials;
+                smtpClient.Send(mailMessage);
+
+
+
                 ticket.AssignTicketUsers.Remove(user);
                 db.Entry(ticket).State = EntityState.Modified;
                 
@@ -278,34 +347,47 @@ namespace BugTracker.Helper
             }
         }
 
-
+       
 
         public IList<ApplicationUser> UsersInTicket(int ticketId)
         {
-            var resultList = new List<ApplicationUser>();
+            //var resultList = new List<ApplicationUser>();
 
 
-            foreach (var user in db.Users.ToList())
-            {
-                if (IsUserInTicket(user.Id, ticketId))
-                {
-                    resultList.Add(user);
-                }
-            }
+            //foreach (var user in db.Users.ToList())
+            //{
+            //    if (IsUserInTicket(user.Id, ticketId))
+            //    {
+            //        resultList.Add(user);
+            //    }
+            //}
+
+            List<ApplicationUser> resultList = (from user in db.Users.ToList()
+                                                where IsUserInTicket(user.Id, ticketId)
+                                                select user).ToList();
+            
+
             return resultList;
         }
 
+       
+
         public IList<ApplicationUser> UsersNotInTicket(int ticketId)
         {
-            var resultList = new List<ApplicationUser>();
+            //var resultList = new List<ApplicationUser>();
 
-            foreach (var user in db.Users.ToList())
-            {
-                if (!IsUserInTicket(user.Id, ticketId))
-                {
-                    resultList.Add(user);
-                }
-            }
+            //foreach (var user in db.Users.ToList())
+            //{
+            //    if (!IsUserInTicket(user.Id, ticketId))
+            //    {
+            //        resultList.Add(user);
+            //    }
+            //}
+
+            List<ApplicationUser> resultList = (from user in db.Users.ToList()
+                                                where !IsUserInTicket(user.Id, ticketId)
+                                                select user).ToList();
+
             return resultList;
         }
 
@@ -322,51 +404,6 @@ namespace BugTracker.Helper
     }
 
     
-    public class TicketHistoryHelper
-    {
-        private ApplicationDbContext db = new ApplicationDbContext();
-
-        public void SendTicketNotification(Notification note)
-        {
-            Ticket ticket = db.Tickets.Find(note.TicketId);
-            ApplicationUser dest = note.Recipient;
-            EmailService es = new EmailService();
-            IdentityMessage message = new IdentityMessage
-            {
-                Destination = dest.Email,
-                Subject = "There's been a change to " + ticket.Title,
-                Body = note.Creator.DisplayName + " changed the " + note.Change + " to " + note.Details + "."
-            };
-            es.SendAsync(message);
-
-        }
-        public void AssignmentNotification(Notification note)
-        {
-            Ticket ticket = db.Tickets.Find(note.TicketId);
-            ApplicationUser dest = note.Recipient;
-            EmailService es = new EmailService();
-            IdentityMessage message = new IdentityMessage
-            {
-                Destination = dest.Email,
-                Subject = "New Ticket Assignment",
-                Body = "You've been assigned to " + ticket.Title + " in " + ticket.Project.Title + "."
-            };
-            es.SendAsync(message);
-        }
-        public void CommentNotification(Notification note)
-        {
-            Ticket ticket = db.Tickets.Find(note.TicketId);
-            ApplicationUser dest = note.Recipient;
-            EmailService es = new EmailService();
-            IdentityMessage message = new IdentityMessage
-            {
-                Destination = dest.Email,
-                Subject = "New Comment on " + ticket.Title,
-                Body = note.Creator.DisplayName + " commented: \"" + note.Details + "\" at " + note.DateNotified + "."
-            };
-            es.SendAsync(message);
-        }
-    }
 
 
 

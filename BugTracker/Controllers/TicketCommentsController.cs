@@ -10,11 +10,14 @@ using BugTracker.Models;
 
 namespace BugTracker.Controllers
 {
+    [Authorize(Roles = "Admin, ProjectManager, Developer, Submitter")]
     public class TicketCommentsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: TicketComments
+        [Authorize(Roles = "Admin, ProjectManager, Developer, Submitter")]
+        [HttpGet]
         public ActionResult Index()
         {
             if (User.IsInRole("Admin") || User.IsInRole("ProjectManager") || User.IsInRole("Developer") || User.IsInRole("Submitter"))
@@ -26,26 +29,28 @@ namespace BugTracker.Controllers
             return RedirectToAction("Error", "Shared");
         }
 
-        // GET: TicketComments/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            TicketComment ticketComment = db.TicketComments.Find(id);
-            if (ticketComment == null)
-            {
-                return HttpNotFound();
-            }
-            if (User.Identity.Name != ticketComment.User.UserName)
-            {
-                return RedirectToAction("Index");
-            }
-            return View(ticketComment);
-        }
+        //// GET: TicketComments/Details/5
+        //public ActionResult Details(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+        //    }
+        //    TicketComment ticketComment = db.TicketComments.Find(id);
+        //    if (ticketComment == null)
+        //    {
+        //        return HttpNotFound();
+        //    }
+        //    if (User.Identity.Name != ticketComment.User.UserName)
+        //    {
+        //        return RedirectToAction("Index");
+        //    }
+        //    return View(ticketComment);
+        //}
 
         // GET: TicketComments/Create
+        [Authorize(Roles = "Admin, ProjectManager, Developer, Submitter")]
+        [HttpGet]
         public ActionResult Create(int id)
         {
             ViewBag.TicketId = new SelectList(db.Tickets, "Id", "UserId");
@@ -61,6 +66,7 @@ namespace BugTracker.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin, ProjectManager, Developer, Submitter")]
         public ActionResult Create([Bind(Include = "Id,TicketId,UserId,CreationDate,Body")] TicketComment ticketComment)
         {
             ticketComment.CreationDate = new DateTimeOffset(DateTime.Now);
@@ -82,46 +88,48 @@ namespace BugTracker.Controllers
             return View(ticketComment);
         }
 
-        // GET: TicketComments/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            TicketComment ticketComment = db.TicketComments.Find(id);
-            if (ticketComment == null)
-            {
-                return HttpNotFound();
-            }
-            if (User.Identity.Name != ticketComment.User.UserName)
-            {
-                return RedirectToAction("Index");
-            }
-            ViewBag.TicketId = new SelectList(db.Tickets, "Id", "UserId", ticketComment.TicketId);
-            ViewBag.UserId = new SelectList(db.Users, "Id", "FirstName", ticketComment.UserId);
-            return View(ticketComment);
-        }
+        //// GET: TicketComments/Edit/5
+        //public ActionResult Edit(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+        //    }
+        //    TicketComment ticketComment = db.TicketComments.Find(id);
+        //    if (ticketComment == null)
+        //    {
+        //        return HttpNotFound();
+        //    }
+        //    if (User.Identity.Name != ticketComment.User.UserName)
+        //    {
+        //        return RedirectToAction("Index");
+        //    }
+        //    ViewBag.TicketId = new SelectList(db.Tickets, "Id", "UserId", ticketComment.TicketId);
+        //    ViewBag.UserId = new SelectList(db.Users, "Id", "FirstName", ticketComment.UserId);
+        //    return View(ticketComment);
+        //}
 
         // POST: TicketComments/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,TicketId,UserId,CreationDate,Body")] TicketComment ticketComment)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(ticketComment).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            ViewBag.TicketId = new SelectList(db.Tickets, "Id", "UserId", ticketComment.TicketId);
-            ViewBag.UserId = new SelectList(db.Users, "Id", "FirstName", ticketComment.UserId);
-            return View(ticketComment);
-        }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Edit([Bind(Include = "Id,TicketId,UserId,CreationDate,Body")] TicketComment ticketComment)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        db.Entry(ticketComment).State = EntityState.Modified;
+        //        db.SaveChanges();
+        //        return RedirectToAction("Index");
+        //    }
+        //    ViewBag.TicketId = new SelectList(db.Tickets, "Id", "UserId", ticketComment.TicketId);
+        //    ViewBag.UserId = new SelectList(db.Users, "Id", "FirstName", ticketComment.UserId);
+        //    return View(ticketComment);
+        //}
 
         // GET: TicketComments/Delete/5
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -143,6 +151,7 @@ namespace BugTracker.Controllers
         // POST: TicketComments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public ActionResult DeleteConfirmed(int id)
         {
             TicketComment ticketComment = db.TicketComments.Find(id);

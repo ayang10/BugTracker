@@ -22,9 +22,9 @@
     <link rel="shortcut icon" href="~/perfectum_dashboard_1_0_5/img/bug.png">
     <!-- end: Favicon -->
 
-
-
-
+    <script src="~/Scripts/jQuery.dotdotdot-master/jquery-1.10.2.js"></script>
+    <script src="~/Scripts/jQuery.dotdotdot-master/jquery.dotdotdot.js"></script>
+   
 </head>
 <body>
 
@@ -55,16 +55,19 @@
                 <div class="nav-collapse sidebar-nav">
                     <ul class="nav nav-tabs nav-stacked ">
 
+                        @if (User.Identity.IsAuthenticated)
+                        {
                         <li>
                             <a href="@Url.Action("Dashboard", "Home")"><i class="icon-home icon-white"></i><span class="hidden-tablet"> Dashboard</span></a>
                         </li>
+                        }
                         @if (User.IsInRole("Admin"))
                         {
                             <li>
                                 <a href="@Url.Action("ListUserRole", "Home", "Admin")"><i class="icon-edit icon-white"></i><span class="hidden-tablet"> Edit Roles</span></a>
                             </li>
                         }
-                        @if (User.IsInRole("Admin"))
+                        @*@if (User.IsInRole("Admin"))
                         {
                             <li>
                                 <a class="dropmenu" href="#"><i class="fa-icon-folder-close-alt"></i><span class="hidden-tablet"> Project</span></a>
@@ -98,24 +101,8 @@
                         <li>
                             <a href="@Url.Action("Index", "Notifications")"><i class="icon-edit icon-white"></i><span class="hidden-tablet"> Notifications </span></a>
                         </li>
-                        }
-                        @*<li><a href="chart.html"><i class="icon-list-alt icon-white"></i><span class="hidden-tablet"> Charts</span></a></li>
-                            <li>
-                                <a class="dropmenu" href="#"><i class="fa-icon-folder-close-alt"></i><span class="hidden-tablet"> Dropdown</span></a>
-                                <ul>
-                                    <li><a class="submenu" href="submenu.html"><i class="fa-icon-file-alt"></i><span class="hidden-tablet"> Sub Menu 1</span></a></li>
-                                    <li><a class="submenu" href="submenu.html"><i class="fa-icon-file-alt"></i><span class="hidden-tablet"> Sub Menu 2</span></a></li>
-                                    <li><a class="submenu" href="submenu.html"><i class="fa-icon-file-alt"></i><span class="hidden-tablet"> Sub Menu 3</span></a></li>
-                                </ul>
-                            </li>
-                            <li><a href="typography.html"><i class="icon-font icon-white"></i><span class="hidden-tablet"> Typography</span></a></li>
-                            <li><a href="gallery.html"><i class="icon-picture icon-white"></i><span class="hidden-tablet"> Gallery</span></a></li>
-                            <li><a href="table.html"><i class="icon-align-justify icon-white"></i><span class="hidden-tablet"> Tables</span></a></li>
-                            <li><a href="calendar.html"><i class="icon-calendar icon-white"></i><span class="hidden-tablet"> Calendar</span></a></li>
-                            <li><a href="grid.html"><i class="icon-th icon-white"></i><span class="hidden-tablet"> Grid</span></a></li>
-                            <li><a href="file-manager.html"><i class="icon-folder-open icon-white"></i><span class="hidden-tablet"> File Manager</span></a></li>
-                            <li><a href="icon.html"><i class="icon-star icon-white"></i><span class="hidden-tablet"> Icons</span></a></li>
-                            <li><a href="login.html"><i class="icon-lock icon-white"></i><span class="hidden-tablet"> Login Page</span></a></li>*@
+                        }*@
+                       
                     </ul>
                 </div><!--/.well -->
             </div><!--/span-->
@@ -137,6 +124,7 @@
 
     </div><!--/.fluid-container-->
     <!-- start: JavaScript-->
+
     <script src="~/perfectum_dashboard_1_0_5/js/jquery-1.9.1.min.js"></script>
     <script src="~/perfectum_dashboard_1_0_5/js/jquery-migrate-1.0.0.min.js"></script>
 

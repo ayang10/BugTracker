@@ -12,6 +12,7 @@ using BugTracker.Models;
 using System.Net.Mail;
 using System.Net.Mime;
 using System.Net;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace BugTracker.Controllers
 {
@@ -96,8 +97,20 @@ namespace BugTracker.Controllers
             }
         }
 
-        //
+        // POST: Guest Login
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Guest(string id)
+        { 
+            ApplicationDbContext db = new ApplicationDbContext();
+            var guestAdmin = db.Users.Find(id);
+            await SignInManager.SignInAsync(guestAdmin, false, false);
+            return RedirectToAction("Dashboard", "Home");
+        }
+
         // GET: /Account/VerifyCode
+        [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
         {
@@ -166,7 +179,63 @@ namespace BugTracker.Controllers
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+                    //var allusers = db.Users.ToList();
+                    //var admins = allusers.Where(x => x.Roles.Select(role => role.RoleId).Contains("Admin")).ToList();
+                    var users = db.Users.Where(x => x.Roles.Select(y => y.RoleId).Contains("15f608c9-6feb-4c34-bbbf-72e19d8e1f0c")).ToList();
                     
+                    var changed = DateTimeOffset.Now;
+                    try
+                    {
+                        //Build Email Message
+                        foreach (var getAdmins in users)
+                        {
+                            MailMessage mailMessage = new MailMessage();
+                            mailMessage.To.Add(new MailAddress(getAdmins.Email, getAdmins.Email));
+                            mailMessage.From = new MailAddress(model.Email, "BuggyTracker");
+                            mailMessage.Subject = "BuggyTracker - New User registered!";
+
+                            //string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+                            //var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+
+                            string bodytext = String.Concat("Please assign new user:" + model.Email + " to a role." +
+                        "<p>Do not respond back to email.</p>");
+                            mailMessage.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(bodytext, null, MediaTypeNames.Text.Html));
+
+                            //Initialise SmtpClient and send
+                            SmtpClient smtpClient = new SmtpClient("smtp.sendgrid.net", Convert.ToInt32(587));
+                            var SendGridCredentials = db.SendgridCredentials.First();
+                            NetworkCredential credentials = new NetworkCredential(SendGridCredentials.UserName, SendGridCredentials.Password);
+                            smtpClient.Credentials = credentials;
+                            smtpClient.Send(mailMessage);
+
+                        //    Notification newRegister = new Notification()
+                        //    {
+                        //        Creator = db.Users.Find(model.Email),
+                        //        CreatorUserId = model.Email,
+                        //        Recipient = db.Users.Find(getAdmins.Email),
+                        //        RecipientUserId = getAdmins.Email,
+                        //        Change = "Please assign new User a role." + "User: " + model.Email,
+                        //        DateNotified = changed
+                        //    };
+               
+                        //db.Notifications.Add(newRegister);
+
+                        db.SaveChanges();
+                           
+                        }
+
+                        return RedirectToAction("Dashboard", "Home");
+
+                    }
+                    catch (Exception ex)
+                    {
+                        ViewBag.Exception = ex.Message;
+                        return View(model);
+                    }
+
+
+
+
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
                     // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);

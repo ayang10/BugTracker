@@ -12,12 +12,14 @@ using BugTracker.Helper;
 
 namespace BugTracker.Controllers
 {
+    [Authorize(Roles = "Admin, ProjectManager")]
     public class ProjectsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
        
         // GET: Projects
         [Authorize(Roles = "Admin")]
+        [HttpGet]
         public ActionResult Index()
         {
             
@@ -26,9 +28,23 @@ namespace BugTracker.Controllers
         }
 
         // GET: Projects/Details/5
-        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        [Authorize(Roles = "Admin, ProjectManager")]
         public ActionResult Details(int? id)
         {
+            UserProjectsHelper helper = new UserProjectsHelper();
+            var user = db.Users.Find(User.Identity.GetUserId());
+
+            Project getproject = db.Projects.FirstOrDefault(x => x.Id == id);
+
+            if (User.IsInRole("ProjectManager"))
+            {
+                if (!helper.IsUserInProject(user.Id, getproject.Id))
+                {
+                    return RedirectToAction("Unauthorized", "Error");
+                }
+            }
+
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -42,6 +58,7 @@ namespace BugTracker.Controllers
         }
 
         // GET: Projects/Create
+        [HttpGet]
         [Authorize(Roles = "Admin")]
         public ActionResult Create()
         {
@@ -136,9 +153,23 @@ namespace BugTracker.Controllers
         }
 
         // GET: Projects/Edit/5
+        [HttpGet]
         [Authorize(Roles = "Admin")]
         public ActionResult Edit(int? id)
         {
+            UserProjectsHelper helper = new UserProjectsHelper();
+            var user = db.Users.Find(User.Identity.GetUserId());
+
+            Project getproject = db.Projects.FirstOrDefault(x => x.Id == id);
+
+            if (User.IsInRole("ProjectManager"))
+            {
+                if (!helper.IsUserInProject(user.Id, getproject.Id))
+                {
+                    return RedirectToAction("Unauthorized", "Error");
+                }
+            }
+
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -184,6 +215,7 @@ namespace BugTracker.Controllers
 
 
         // GET: Projects/Delete/5
+        [HttpGet]
         [Authorize(Roles = "Admin")]
         public ActionResult Delete(int? id)
         {

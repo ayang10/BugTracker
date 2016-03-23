@@ -94,18 +94,33 @@
                 @if (User.Identity.IsAuthenticated == false)
                 {
                     <h1>Guest Login to tour our atmosphere</h1>
-
-
-
-                                <div class="buttons">
-                                    <button class="btn btn-primary"><i class="icon-bell icon-white"></i>Admin</button>
-                                    <button class="btn btn-success"><i class="icon-camera icon-white"></i>Project Manager</button>
-                                    <button class="btn btn-danger"><i class="icon-film icon-white"></i>Developer</button>
-                                    <button class="btn btn-warning"><i class="icon-book icon-white"></i>Submitter</button>
-
-                                </div>
+                    <div class="buttons">
+                                    <form method="post" action="@Url.Action("Guest", "Account", new { id = "1273a7e8-0a57-4bc4-9602-2e3fb62cf1ff" })">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-info">Guest Admin</button>
+                                    </form>
+                         
+                                    <form method="post" action="@Url.Action("Guest", "Account", new { id = "3588a2c5-9132-49b5-b24f-2c353cca6b1b" })">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-success">Guest ProjectManager</button>
+                                    </form>
+                                    <form method="post" action="@Url.Action("Guest", "Account", new { id = "ad0ce658-db1f-4c74-9fdd-996490074542" })">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-warning">Guest Developer</button>
+                                    </form>
+                                    <form method="post" action="@Url.Action("Guest", "Account", new { id = "41d15bd0-ed6b-4eec-aa62-7c7525a7c1e0" })">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-danger">Guest Submitter</button>
+                                    </form>
+                            </div>
                 }
-
+                <hr />
+                <div class="pull-right">
+                    <img src="~/perfectum_dashboard_1_0_5/img/HTML5_CSS_JavaScript.png" height="100" width="100" />
+                    <img src="~/perfectum_dashboard_1_0_5/img/cs.png" height="100" width="100" />
+                    <img src="~/perfectum_dashboard_1_0_5/img/sql.png" height="100" width="100" />
+                    <img src="~/perfectum_dashboard_1_0_5/img/mvc.png" height="100" width="100" />
+                </div>
             </div><!--/fluid-row-->
 
         </div>

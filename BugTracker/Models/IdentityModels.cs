@@ -40,7 +40,7 @@ namespace BugTracker.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
-            : base("AzureConnection", throwIfV1Schema: false)
+            : base("BugTracker", throwIfV1Schema: false)
         {
         }
 
